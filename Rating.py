@@ -20,8 +20,6 @@ doc = pl.Document(default_filepath=filepath, geometry_options=geometry_options,
                document_options='12pt', fontenc='T2A,T1', lmodern=False, textcomp=False,
                page_numbers=False)
 
-
-
 babel = pl.Package('babel',['english','russian'])
 doc.packages.append(babel)
 doc.packages.append(pl.Package('array'))
@@ -64,6 +62,8 @@ with doc.create(pl.LongTable(pl.utils.NoEscape(r"ccm{7.5cm}>{\centering\arraybac
 with doc.create(pl.position.FlushRight()):
     doc.append('Итого 75 баллов')
 
+doc.append(pl.utils.NoEscape(r'\vspace{5mm}'))
+
 with doc.create(pl.position.Center()):
     doc.append(pl.utils.NoEscape(r'{\large Критерии оценки}\\'))
 
@@ -75,10 +75,10 @@ with doc.create(pl.position.Center()):
         table.add_row(('Зачет', '9'))
         table.add_hline()
 
-doc.append(pl.basic.NewLine())
+doc.append(pl.utils.NoEscape(r'\vspace{5mm}'))
 
 with doc.create(pl.Tabular('p{12.0cm} p{5.0cm}')) as table:
     table.add_row(('Доцент кафедры САУ', 'Д.К. Лобанов'))
     table.add_row(('Зав. кафедрой САУ', 'М.В. Лукьяненко'))
 
-doc.generate_tex(filepath=os.path.join(filepath,'test0'))
+doc.generate_tex(filepath=os.path.join(filepath,'rating'))
