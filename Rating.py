@@ -10,9 +10,11 @@ Created on Mon Oct  7 18:32:23 2019
 import pylatex as pl
 import os
 
-#if __name__ == '__main__':
+
 
 filepath='/home/alex/Учебная работа/РПД/БД/'
+
+
 geometry_options = ['a4paper', "tmargin=2cm", "lmargin=2.5cm", "rmargin=1.5cm", "bmargin=2cm"]
 
 
@@ -82,3 +84,6 @@ with doc.create(pl.Tabular('p{12.0cm} p{5.0cm}')) as table:
     table.add_row(('Зав. кафедрой САУ', 'М.В. Лукьяненко'))
 
 doc.generate_tex(filepath=os.path.join(filepath,'rating'))
+
+
+if __name__ == '__main__':
