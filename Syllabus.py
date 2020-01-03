@@ -15,7 +15,7 @@ import xml.etree.ElementTree as etree
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
-fileJSON = 'НЭ ЭК КА.json'
+
 
 
 def GetJsonFromFile(filePath):
@@ -60,16 +60,60 @@ def iterData(dataJSON, keyPrefix=''):
 """
 
 # -------- Читаем JSON
-dataJSON = json.loads(GetJsonFromFile(os.path.join(folder, fileJSON)))
+fileJSON = 'НЭ ЭК КА.json'
+raw = GetJsonFromFile(os.path.join(folder, fileJSON))
+dataJSON = json.loads(raw)
 
 data = iterData(dataJSON)
 dTag = {} # Здесь будут только единичные данные (не списки)
 for (key, value) in data.items():
     if not(type(value) is list):
-        dTag.update({key:value})
+        dTag.update({key: value})
+
+# дописать вычисления Total
+dTag['VolumeContactSeminarsTotal'] = (dTag['VolumeContactSeminars']+
+    dTag['VolumeContactPractical']+
+    dTag['VolumeContactWorkshops']+
+    dTag['VolumeContactLaboratory']+
+    dTag['VolumeContactColloquiums'])
+dTag['VolumeContactAnother'] = (dTag['VolumeContactDesign']+
+    dTag['VolumeContactConsultations']+
+    dTag['VolumeContactIndividual'])
+
+dTag['VolumeContactTotal'] = (dTag['VolumeContactLections']+
+    dTag['VolumeContactSeminarsTotal']+
+    dTag['VolumeContactAnother']+
+    dTag['VolumeContactOther'])
+
+dTag['VolumeIndependentTotal'] = (dTag['VolumeIndependentTheoretical']+
+    dTag['VolumeIndependentTasks']+
+    dTag['VolumeIndependentCalculations']+
+    dTag['VolumeIndependentEssay']+
+    dTag['VolumeIndependentDesign']+
+    dTag['VolumeIndependentControl']+
+    dTag['VolumeIndependentOther'])
+
+dTag['VolumeHoursTotal'] = (dTag['VolumeContactTotal']+
+    dTag['VolumeIndependentTotal'])
+dTag['VolumePointsTotal'] = int(dTag['VolumeHoursTotal']/36)
 
 
+# TODO: кавычки елочки
+#«»
+dTag['ConnectsWithList']=''
+for item in data['ConnectsWith']:
+    dTag['ConnectsWithList']=dTag['ConnectsWithList']+'«'+item+'», '
+dTag['ConnectsWithList'] = dTag['ConnectsWithList'][:-2] + '.'
 
+dTag['NecessaryForList']=''
+for item in data['NecessaryFor']:
+    dTag['NecessaryForList']=dTag['NecessaryForList']+' '+item+', '
+dTag['NecessaryForList'] = dTag['NecessaryForList'][:-2] + ' и др.'
+
+
+for (key, value) in dTag.items():
+    if key.beginswith('Volume') and value==0:
+        value = '-'
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt
@@ -81,7 +125,7 @@ with open(os.path.join(folder, fileOut), "w") as fOut:
         for line in fIn: # ситаем построчно входной файл, делае копию строки и работаем с ней
             outLine = line[:]
             for (key, value) in dTag.items():
-                outLine = outLine.replace('{'+key+'}', value) # замена по тегам
+                outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
             fOut.write(outLine) # построчно пишем в выходной файл
 
 
