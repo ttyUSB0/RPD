@@ -60,11 +60,13 @@ def iterData(dataJSON, keyPrefix=''):
 """
 
 # -------- Читаем JSON
-raw = GetJsonFromFile(os.path.join(folder, fileJSON))
-dataJSON = json.loads(raw)
+dataJSON = json.loads(GetJsonFromFile(os.path.join(folder, fileJSON)))
 
-dTag = iterData(dataJSON)
-
+data = iterData(dataJSON)
+dTag = {} # Здесь будут только единичные данные (не списки)
+for (key, value) in data.items():
+    if not(type(value) is list):
+        dTag.update({key:value})
 
 
 
@@ -74,10 +76,15 @@ dTag = iterData(dataJSON)
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
-with open(os.path.join(folder, fileIn), "r") as file:
-    # read a list of lines into data
-    lines = file.readlines()
+with open(os.path.join(folder, fileOut), "w") as fOut:
+    with open(os.path.join(folder, fileIn), "r") as fIn:
+        for line in fIn: # ситаем построчно входной файл, делае копию строки и работаем с ней
+            outLine = line[:]
+            for (key, value) in dTag.items():
+                outLine = outLine.replace('{'+key+'}', value) # замена по тегам
+            fOut.write(outLine) # построчно пишем в выходной файл
 
-for line in lines:
-    # Заменяем теги значениями
+
+
+
 
