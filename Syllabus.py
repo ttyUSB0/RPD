@@ -10,6 +10,8 @@ Created on Mon Oct  7 18:32:23 2019
 """
 
 import os
+import json
+import xml.etree.ElementTree as etree
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
@@ -17,10 +19,9 @@ fileJSON = 'НЭ ЭК КА.json'
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
-import xml.etree.ElementTree as etree
+
 tree = etree.parse(os.path.join(folder, fileIn))
 document = tree.getroot()
-
 body = document.find('{urn:oasis:names:tc:opendocument:xmlns:office:1.0}body')
 text = body.find('{urn:oasis:names:tc:opendocument:xmlns:office:1.0}text')
 
