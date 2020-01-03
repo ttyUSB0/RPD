@@ -17,39 +17,27 @@ fileJSON = 'НЭ ЭК КА.json'
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
-from xml.dom import minidom
+import xml.etree.ElementTree as etree
+tree = etree.parse(os.path.join(folder, fileIn))
+document = tree.getroot()
 
-dom = minidom.parse(os.path.join(folder, fileIn))
-dom.normalize()
+body = document.find('{urn:oasis:names:tc:opendocument:xmlns:office:1.0}body')
+text = body.find('{urn:oasis:names:tc:opendocument:xmlns:office:1.0}text')
 
-doc = dom.getElementsByTagName('office:document')[0]
-body = doc.getElementsByTagName('office:body')[0]
-text = body.getElementsByTagName('office:text')[0]
+pColl = text.findall('{urn:oasis:names:tc:opendocument:xmlns:text:1.0}p')
+for p in pColl:
 
-attrib = doc.attributes.item(0)
-attrib.value
+p = pColl[0]
+p.text
+# 'МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ'
 
-len(text.childNodes)
-
-def printChild(domObj):
-    print('--- Объект "%s" имеет %d атрибутов:'%(domObj.nodeName, len(domObj.attributes)))
-
-    for i in range(len(domObj.attributes)):
-        print(domObj.attributes.item(i).value)
-
-    print('--- Объект "%s" содержит %d узлов:'%(domObj.nodeName, len(domObj.childNodes)))
-    for child in domObj.childNodes:
-        print('* узел "%s" содержит %d доч.узлов'%(child.nodeName, len(child.childNodes)))
+def printChild(obj):
+    print('--- Объект "%s" содержит %d узлов:'%(obj.tag, len(obj)))
+    for child in obj:
+        print('\t%s'%(child.tag,))
 
 
 
-printChild(text)
 
-
-collTextP = text.getElementsByTagName("text:p")
-len(collTextP)
-textP = collTextP[50]
-
-textP.nodeValue
 
 
