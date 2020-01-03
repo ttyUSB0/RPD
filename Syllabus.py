@@ -20,6 +20,31 @@ fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
 
+def GetJsonFromFile(filePath):
+    """ исключает комментарии
+    //
+    /* */
+    https://stackoverflow.com/a/57814048/5355749
+    """
+    contents = ""
+    fh = open(filePath)
+    for line in fh:
+        cleanedLine = line.split("//", 1)[0]
+        if len(cleanedLine) > 0 and line.endswith("\n") and "\n" not in cleanedLine:
+            cleanedLine += "\n"
+        contents += cleanedLine
+    fh.close
+    while "/*" in contents:
+        preComment, postComment = contents.split("/*", 1)
+        contents = preComment + postComment.split("*/", 1)[1]
+    return contents
+
+
+raw = GetJsonFromFile(os.path.join(folder, fileJSON))
+data = json.loads(raw)
+
+
+
 tree = etree.parse(os.path.join(folder, fileIn))
 document = tree.getroot()
 body = document.find('{urn:oasis:names:tc:opendocument:xmlns:office:1.0}body')
