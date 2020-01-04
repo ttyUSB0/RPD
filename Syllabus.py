@@ -11,7 +11,6 @@ Created on Mon Oct  7 18:32:23 2019
 
 import os
 import json
-import xml.etree.ElementTree as etree
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
@@ -70,7 +69,7 @@ for (key, value) in data.items():
     if not(type(value) is list):
         dTag.update({key: value})
 
-# дописать вычисления Total
+# Расчеты часов, к заполнению в поля
 dTag['VolumeContactSeminarsTotal'] = (dTag['VolumeContactSeminars']+
     dTag['VolumeContactPractical']+
     dTag['VolumeContactWorkshops']+
@@ -97,9 +96,12 @@ dTag['VolumeHoursTotal'] = (dTag['VolumeContactTotal']+
     dTag['VolumeIndependentTotal'])
 dTag['VolumePointsTotal'] = int(dTag['VolumeHoursTotal']/36)
 
+# Заменяем нули на минусы
+for (key, value) in dTag.items():
+    if key.startswith('Volume') and value==0:
+        dTag[key] = '-'
 
-# TODO: кавычки елочки
-#«»
+# Списки
 dTag['ConnectsWithList']=''
 for item in data['ConnectsWith']:
     dTag['ConnectsWithList']=dTag['ConnectsWithList']+'«'+item+'», '
@@ -107,13 +109,19 @@ dTag['ConnectsWithList'] = dTag['ConnectsWithList'][:-2] + '.'
 
 dTag['NecessaryForList']=''
 for item in data['NecessaryFor']:
-    dTag['NecessaryForList']=dTag['NecessaryForList']+' '+item+', '
+    dTag['NecessaryForList']=dTag['NecessaryForList']+'«'+item+'», '
 dTag['NecessaryForList'] = dTag['NecessaryForList'][:-2] + ' и др.'
 
+dTag['Tasks']=''
+for item in data['Tasks']:
+    dTag['Tasks']=dTag['Tasks']+' '+item+'; '
+dTag['Tasks'] = dTag['Tasks'][:-2] + '.'
 
-for (key, value) in dTag.items():
-    if key.beginswith('Volume') and value==0:
-        value = '-'
+#TODO: спросить расшифровку кода УП, сформировать строку
+import re
+code = re.findall(r'[А-Я]+', data['CodeUp'])
+number = re.findall(r'\d+', data['CodeUp'])
+
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt
