@@ -7,7 +7,7 @@ Created on Sat Jan  4 10:30:31 2020
 Формирование json  из компетенций
 """
 import os
-import re
+import json
 
 
 folder='/home/alex/Учебная работа/РПД/БД/'
@@ -20,23 +20,22 @@ with open(os.path.join(folder, fileIn), "r") as file:
 z = f.split('$')
 z[0]=z[0][1:]
 
-comp = []
+Competences = []
 
-i=0
-
-sepList = ['Знать:', 'Уметь:']
-
-for i in range(len(z)/3):
+for i in range(int(len(z)/3)):
     A = z[i*3]
     B = z[i*3+1]
     C = z[i*3+2]
 
     code = A.split('.')[0]
+    if code=='':
+        print('!!!')
     competence = A[len(code)+1:]
 
-    indicators = B
-    results = {}
-    for sep in sepList:
+    Competences.append({'Code':code, 'Comp':competence, 'Indicators':B, 'Results':C})
+
+with open(os.path.join(folder, fileOut), "w") as file:
+    json.dump(Competences, file)
 
 
 
