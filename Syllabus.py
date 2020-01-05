@@ -121,10 +121,61 @@ import re
 code = re.findall(r'[А-Я]+', data['CodeUp'])
 number = re.findall(r'\d+', data['CodeUp'])
 
+# Таблица компетенций
 with open(os.path.join(folder, fileCompetences), "r") as file:
     Competences = json.load(file)
+# Компетенции. Ищем строку с {CompetenceTable}, заменяем ее всю на xml-код таблицы
+tabCompetencesPrefix = """
+   <table:table table:name="TableGoal" table:style-name="TableGoal">
+    <table:table-column table:style-name="TableGoal.A"/>
+    <table:table-column table:style-name="TableGoal.B"/>
+    <table:table-column table:style-name="TableGoal.C"/>
+    <table:table-column table:style-name="TableGoal.D"/>
+    <table:table-row>
+     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+      <text:p text:style-name="P49">Код компе-тенции</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+      <text:p text:style-name="P49">Содержание компетенции</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+      <text:p text:style-name="P49">Индикаторы достижения компетенции</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.D1" office:value-type="string">
+      <text:p text:style-name="P49">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
+     </table:table-cell>
+    </table:table-row>
+"""
+# Заменяемая часть
+tabCompetencesRow = """
+    <table:table-row>
+     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+      <text:p text:style-name="P49">{Code}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+      <text:p text:style-name="P49">{Comp}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+      <text:p text:style-name="P49">{Indicators}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.D2" office:value-type="string">
+      <text:p text:style-name="P49">{Results}</text:p>
+     </table:table-cell>
+    </table:table-row>
+"""
+tabCompetencesSuffix = """
+   </table:table>
+"""
 
-
+tabCompetences = tabCompetencesPrefix
+for key in data['Competences']:
+    comp = Competences[key]
+    row = tabCompetencesRow.replace('{Code}', comp['Code'])
+    row = row.replace('{Comp}', comp['Comp'])
+    row = row.replace('{Indicators}', comp['Indicators'])
+    row = row.replace('{Results}', comp['Results'])
+    tabCompetences = tabCompetences + row
+tabCompetences = tabCompetences + tabCompetencesSuffix
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt
@@ -136,54 +187,17 @@ with open(os.path.join(folder, fileOut), "w") as fOut:
     with open(os.path.join(folder, fileIn), "r") as fIn:
         for line in fIn: # ситаем построчно входной файл, делае копию строки и работаем с ней
             outLine = line[:]
-            for (key, value) in dTag.items():
-                outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
+            if outLine.find('{TableCompetence}')>=0: # таблица, заменяем строку
+                outLine = tabCompetences
+            else: # не таблица
+                for (key, value) in dTag.items():
+                    outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
+
             fOut.write(outLine) # построчно пишем в выходной файл
 
 # работаем с таблицами
 
-# Компетенции. Ищем строку с {CompetenceTable}, заменяем ее всю на xml-код таблицы
-"""
-   <table:table table:name="TableGoal" table:style-name="TableGoal">
-    <table:table-column table:style-name="TableGoal.A"/>
-    <table:table-column table:style-name="TableGoal.B"/>
-    <table:table-column table:style-name="TableGoal.C"/>
-    <table:table-column table:style-name="TableGoal.D"/>
-    <table:table-row>
-     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-      <text:p text:style-name="P2">Код компе-тенции</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-      <text:p text:style-name="P2">Содержание компетенции</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-      <text:p text:style-name="P2">Индикаторы достижения компетенции</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.D1" office:value-type="string">
-      <text:p text:style-name="P2">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
-     </table:table-cell>
-    </table:table-row>
-"""
-# Заменяемая часть
-"""
-    <table:table-row>
-     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-      <text:p text:style-name="P3">1</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-      <text:p text:style-name="P3">2</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-      <text:p text:style-name="P3">3</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.D2" office:value-type="string">
-      <text:p text:style-name="P3">4</text:p>
-     </table:table-cell>
-    </table:table-row>
-"""
-"""
-   </table:table>
-"""
+
 
 
 
