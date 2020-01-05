@@ -14,9 +14,6 @@ import json
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
-
-
-
 def GetJsonFromFile(filePath):
     """ исключает комментарии
     //
@@ -58,8 +55,10 @@ def iterData(dataJSON, keyPrefix=''):
 Выделить таблицы отдельно? Обрабатывать их каждый своим алгоритмом?
 """
 
-# -------- Читаем JSON
+# -------- Читаем JSONы
+fileCompetences = 'ЭККА компетенции.json'
 fileJSON = 'НЭ ЭК КА.json'
+
 raw = GetJsonFromFile(os.path.join(folder, fileJSON))
 dataJSON = json.loads(raw)
 
@@ -122,12 +121,17 @@ import re
 code = re.findall(r'[А-Я]+', data['CodeUp'])
 number = re.findall(r'\d+', data['CodeUp'])
 
+with open(os.path.join(folder, fileCompetences), "r") as file:
+    Competences = json.load(file)
+
+
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
+# Заменяем теги значениями из словаря dTag
 with open(os.path.join(folder, fileOut), "w") as fOut:
     with open(os.path.join(folder, fileIn), "r") as fIn:
         for line in fIn: # ситаем построчно входной файл, делае копию строки и работаем с ней
@@ -136,7 +140,50 @@ with open(os.path.join(folder, fileOut), "w") as fOut:
                 outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
             fOut.write(outLine) # построчно пишем в выходной файл
 
+# работаем с таблицами
 
+# Компетенции. Ищем строку с {CompetenceTable}, заменяем ее всю на xml-код таблицы
+"""
+   <table:table table:name="TableGoal" table:style-name="TableGoal">
+    <table:table-column table:style-name="TableGoal.A"/>
+    <table:table-column table:style-name="TableGoal.B"/>
+    <table:table-column table:style-name="TableGoal.C"/>
+    <table:table-column table:style-name="TableGoal.D"/>
+    <table:table-row>
+     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+      <text:p text:style-name="P2">Код компе-тенции</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+      <text:p text:style-name="P2">Содержание компетенции</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+      <text:p text:style-name="P2">Индикаторы достижения компетенции</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.D1" office:value-type="string">
+      <text:p text:style-name="P2">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
+     </table:table-cell>
+    </table:table-row>
+"""
+# Заменяемая часть
+"""
+    <table:table-row>
+     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+      <text:p text:style-name="P3">1</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+      <text:p text:style-name="P3">2</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+      <text:p text:style-name="P3">3</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="TableGoal.D2" office:value-type="string">
+      <text:p text:style-name="P3">4</text:p>
+     </table:table-cell>
+    </table:table-row>
+"""
+"""
+   </table:table>
+"""
 
 
 

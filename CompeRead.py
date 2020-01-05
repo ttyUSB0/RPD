@@ -12,6 +12,7 @@ import json
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 fileIn = 'ЭККА компетенции.txt'
+fileIn = 'КТОРИИиЭСУ компетенции.txt'
 fileOut = fileIn.split('.')[0] + '.json'
 
 with open(os.path.join(folder, fileIn), "r") as file:
@@ -34,8 +35,13 @@ for i in range(int(len(z)/3)):
 
     Competences.append({'Code':code, 'Comp':competence, 'Indicators':B, 'Results':C})
 
+# Переделываем в словарь - удобнее искать
+NewComp = {}
+for c in Competences:
+    NewComp[c['Code']] = c
+
 with open(os.path.join(folder, fileOut), "w") as file:
-    json.dump(Competences, file)
+    json.dump(NewComp, file, ensure_ascii=False, indent=2)
 
 
 
