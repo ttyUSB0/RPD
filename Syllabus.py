@@ -177,6 +177,56 @@ for key in data['Competences']:
     tabCompetences = tabCompetences + row
 tabCompetences = tabCompetences + tabCompetencesSuffix
 
+
+import BeautifulSoup4
+text = tabCompetencesPrefix+tabCompetencesRow+tabCompetencesSuffix
+with open(os.path.join(folder, 'test.xml'), "w") as file:
+    file.write(text)
+
+
+text = """<?xml version="1.0"?>
+<table:table table:name="TableGoal" table:style-name="TableGoal">
+<table:table-column table:style-name="TableGoal.A"/>
+<table:table-column table:style-name="TableGoal.B"/>
+<table:table-column table:style-name="TableGoal.C"/>
+<table:table-column table:style-name="TableGoal.D"/>
+<table:table-row>
+ <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+  <text:p text:style-name="P49">Код компе-тенции</text:p>
+ </table:table-cell>
+ <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+  <text:p text:style-name="P49">Содержание компетенции</text:p>
+ </table:table-cell>
+ <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
+  <text:p text:style-name="P49">Индикаторы достижения компетенции</text:p>
+ </table:table-cell>
+ <table:table-cell table:style-name="TableGoal.D1" office:value-type="string">
+  <text:p text:style-name="P49">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
+ </table:table-cell>
+</table:table-row>
+<table:table-row>
+ <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+  <text:p text:style-name="P49">{Code}</text:p>
+ </table:table-cell>
+ <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+  <text:p text:style-name="P49">{Comp}</text:p>
+ </table:table-cell>
+ <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
+  <text:p text:style-name="P49">{Indicators}</text:p>
+ </table:table-cell>
+ <table:table-cell table:style-name="TableGoal.D2" office:value-type="string">
+  <text:p text:style-name="P49">{Results}</text:p>
+ </table:table-cell>
+</table:table-row>
+</table:table>"""
+root = ET.fromstring(text)
+
+
+
+
+
+
+
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt
 fileIn = 'layout.fodt'
@@ -195,7 +245,7 @@ with open(os.path.join(folder, fileOut), "w") as fOut:
 
             fOut.write(outLine) # построчно пишем в выходной файл
 
-# работаем с таблицами
+
 
 
 
