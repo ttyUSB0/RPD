@@ -11,6 +11,7 @@ Created on Mon Oct  7 18:32:23 2019
 
 import os
 import json
+from bs4 import BeautifulSoup
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
@@ -121,133 +122,99 @@ import re
 code = re.findall(r'[А-Я]+', data['CodeUp'])
 number = re.findall(r'\d+', data['CodeUp'])
 
-# Таблица компетенций
-with open(os.path.join(folder, fileCompetences), "r") as file:
-    Competences = json.load(file)
-# Компетенции. Ищем строку с {CompetenceTable}, заменяем ее всю на xml-код таблицы
-tabCompetencesPrefix = """
-   <table:table table:name="TableGoal" table:style-name="TableGoal">
-    <table:table-column table:style-name="TableGoal.A"/>
-    <table:table-column table:style-name="TableGoal.B"/>
-    <table:table-column table:style-name="TableGoal.C"/>
-    <table:table-column table:style-name="TableGoal.D"/>
-    <table:table-row>
-     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-      <text:p text:style-name="P49">Код компе-тенции</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-      <text:p text:style-name="P49">Содержание компетенции</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-      <text:p text:style-name="P49">Индикаторы достижения компетенции</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.D1" office:value-type="string">
-      <text:p text:style-name="P49">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
-     </table:table-cell>
-    </table:table-row>
-"""
-# Заменяемая часть
-tabCompetencesRow = """
-    <table:table-row>
-     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-      <text:p text:style-name="P49">{Code}</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-      <text:p text:style-name="P49">{Comp}</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-      <text:p text:style-name="P49">{Indicators}</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="TableGoal.D2" office:value-type="string">
-      <text:p text:style-name="P49">{Results}</text:p>
-     </table:table-cell>
-    </table:table-row>
-"""
-tabCompetencesSuffix = """
-   </table:table>
-"""
-
-tabCompetences = tabCompetencesPrefix
-for key in data['Competences']:
-    comp = Competences[key]
-    row = tabCompetencesRow.replace('{Code}', comp['Code'])
-    row = row.replace('{Comp}', comp['Comp'])
-    row = row.replace('{Indicators}', comp['Indicators'])
-    row = row.replace('{Results}', comp['Results'])
-    tabCompetences = tabCompetences + row
-tabCompetences = tabCompetences + tabCompetencesSuffix
-
-
-import BeautifulSoup4
-text = tabCompetencesPrefix+tabCompetencesRow+tabCompetencesSuffix
-with open(os.path.join(folder, 'test.xml'), "w") as file:
-    file.write(text)
-
-
-text = """<?xml version="1.0"?>
-<table:table table:name="TableGoal" table:style-name="TableGoal">
-<table:table-column table:style-name="TableGoal.A"/>
-<table:table-column table:style-name="TableGoal.B"/>
-<table:table-column table:style-name="TableGoal.C"/>
-<table:table-column table:style-name="TableGoal.D"/>
-<table:table-row>
- <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-  <text:p text:style-name="P49">Код компе-тенции</text:p>
- </table:table-cell>
- <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-  <text:p text:style-name="P49">Содержание компетенции</text:p>
- </table:table-cell>
- <table:table-cell table:style-name="TableGoal.A1" office:value-type="string">
-  <text:p text:style-name="P49">Индикаторы достижения компетенции</text:p>
- </table:table-cell>
- <table:table-cell table:style-name="TableGoal.D1" office:value-type="string">
-  <text:p text:style-name="P49">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
- </table:table-cell>
-</table:table-row>
-<table:table-row>
- <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-  <text:p text:style-name="P49">{Code}</text:p>
- </table:table-cell>
- <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-  <text:p text:style-name="P49">{Comp}</text:p>
- </table:table-cell>
- <table:table-cell table:style-name="TableGoal.A2" office:value-type="string">
-  <text:p text:style-name="P49">{Indicators}</text:p>
- </table:table-cell>
- <table:table-cell table:style-name="TableGoal.D2" office:value-type="string">
-  <text:p text:style-name="P49">{Results}</text:p>
- </table:table-cell>
-</table:table-row>
-</table:table>"""
-root = ET.fromstring(text)
-
-
-
-
-
-
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
-# -------- Читаем шаблон fodt
+# -------- Читаем шаблон fodt, заменяем теги
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
 # Заменяем теги значениями из словаря dTag
+with open(os.path.join(folder, fileIn), "r") as file:
+    soup = BeautifulSoup(file.read(), features="xml")
+
+for (key, value) in dTag.items():
+    ans = soup.find('p', string=key)
+
+
 with open(os.path.join(folder, fileOut), "w") as fOut:
     with open(os.path.join(folder, fileIn), "r") as fIn:
         for line in fIn: # ситаем построчно входной файл, делае копию строки и работаем с ней
             outLine = line[:]
-            if outLine.find('{TableCompetence}')>=0: # таблица, заменяем строку
-                outLine = tabCompetences
-            else: # не таблица
-                for (key, value) in dTag.items():
-                    outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
+            for (key, value) in dTag.items():
+                outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
 
             fOut.write(outLine) # построчно пишем в выходной файл
 
 
+# Работа с таблицами
+
+doc = """
+<office:body xmlns:office="dfs" xmlns:text="text">
+<text:p text:style-name="P18">РАБОЧАЯ ПРОГРАММА ДИСЦИПЛИНЫ </text:p>
+<text:p text:style-name="P17"/>
+<text:p text:style-name="P20">{Name}</text:p>
+<text:p text:style-name="P17"/>
+<text:p text:style-name="P17"/>
+<text:p text:style-name="P18">Направление подготовки</text:p>
+<text:p text:style-name="P20">{ProgramCode} {ProgramDirection}</text:p>
+<text:p text:style-name="P18"/>
+<text:p text:style-name="P18">Направленность (профиль) образовательной программы</text:p>
+<text:p text:style-name="P20">{ProgramProfile}</text:p>
+<text:p text:style-name="P18"/>
+<text:p text:style-name="P18"/>
+<text:p text:style-name="P18">Уровень высшего образования</text:p>
+<text:p text:style-name="P20">{ProgramLevel}</text:p>
+</office:body>
+"""
+soup = BeautifulSoup(doc, features="xml")
+print(soup.prettify())
+
+for item in soup.findAll(text='{Name}'):
+    item.parent.string = '-----------------------------'
+
+print(soup.prettify())
 
 
 
 
+with open(os.path.join(folder, fileIn), "r") as file:
+    soup = BeautifulSoup(file.read(), features="xml")
+
+for item in soup.findAll(text='{Name}'):
+    item.string.replace_with = 'ASDFGH'
+
+
+    item.replace_with = 'ASDFGH'
+
+with open(os.path.join(folder, fileOut), "w") as file:
+    file.write(str(soup))
+
+
+
+
+
+row = ans.parent.parent
+table = row.parent
+
+
+import copy
+row2 = copy.copy(row)
+row.insert_after(row2)
+
+soup_string = str(soup)
+
+print(soup.prettify())
+
+#tabCompetences = tabCompetencesPrefix
+#for key in data['Competences']:
+#    comp = Competences[key]
+#    row = tabCompetencesRow.replace('{Code}', comp['Code'])
+#    row = row.replace('{Comp}', comp['Comp'])
+#    row = row.replace('{Indicators}', comp['Indicators'])
+#    row = row.replace('{Results}', comp['Results'])
+#    tabCompetences = tabCompetences + row
+#tabCompetences = tabCompetences + tabCompetencesSuffix
+
+with open(os.path.join(folder, fileOut), "w") as file:
+    file.write(str(soup))
 
