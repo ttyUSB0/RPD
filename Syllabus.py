@@ -122,6 +122,10 @@ import re
 code = re.findall(r'[А-Я]+', data['CodeUp'])
 number = re.findall(r'\d+', data['CodeUp'])
 
+dTag['PartName'] = ''
+dTag['Type'] = ''
+dTag['Contents'] = ''
+dTag['CodeUp'] = ''
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
@@ -132,18 +136,13 @@ fileOut = 'syllabus.fodt'
 with open(os.path.join(folder, fileIn), "r") as file:
     soup = BeautifulSoup(file.read(), features="xml")
 
-for (key, value) in dTag.items():
-    ans = soup.find('p', string=key)
 
+for item in soup.findAll(text=re.compile('{*\w}')):
+    string = item.parent.string
+    item.parent.string = string.format(**dTag)
 
-with open(os.path.join(folder, fileOut), "w") as fOut:
-    with open(os.path.join(folder, fileIn), "r") as fIn:
-        for line in fIn: # ситаем построчно входной файл, делае копию строки и работаем с ней
-            outLine = line[:]
-            for (key, value) in dTag.items():
-                outLine = outLine.replace('{'+key+'}', str(value)) # замена по тегам
-
-            fOut.write(outLine) # построчно пишем в выходной файл
+with open(os.path.join(folder, fileOut), "w") as file:
+    file.write(str(soup))
 
 
 # Работа с таблицами
@@ -169,30 +168,6 @@ doc = """
 soup = BeautifulSoup(doc, features="xml")
 print(soup.prettify())
 
-for item in soup.findAll(text='{Name}'):
-    item.parent.string = '-----------------------------'
-
-print(soup.prettify())
-
-
-
-
-with open(os.path.join(folder, fileIn), "r") as file:
-    soup = BeautifulSoup(file.read(), features="xml")
-
-for item in soup.findAll(text='{Name}'):
-    item.string.replace_with = 'ASDFGH'
-
-
-    item.replace_with = 'ASDFGH'
-
-with open(os.path.join(folder, fileOut), "w") as file:
-    file.write(str(soup))
-
-
-
-
-
 row = ans.parent.parent
 table = row.parent
 
@@ -215,6 +190,5 @@ print(soup.prettify())
 #    tabCompetences = tabCompetences + row
 #tabCompetences = tabCompetences + tabCompetencesSuffix
 
-with open(os.path.join(folder, fileOut), "w") as file:
-    file.write(str(soup))
+
 
