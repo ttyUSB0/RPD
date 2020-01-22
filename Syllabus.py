@@ -53,7 +53,10 @@ def iterData(dataJSON, keyPrefix=''):
 """ ! как поставить в соответствие теги в документе и в json?
 Единообразно не получится, т.к. есть табличные данные (list для лекций) и единичные (Name, Year)
 
-Выделить таблицы отдельно? Обрабатывать их каждый своим алгоритмом?
+ Работа с таблицами:
+ Ищем таблицу по имени
+ берём последнюю строку, вырезаем её
+ вставляем её, заменяя теги.
 """
 
 # -------- Читаем JSONы
@@ -127,16 +130,43 @@ dTag['Type'] = ''
 dTag['Contents'] = ''
 dTag['CodeUp'] = ''
 
+# --- компетенции
+raw = GetJsonFromFile(os.path.join(folder, fileCompetences))
+dataComp = json.loads(raw)
+competences = {}
+for key in data['Competences']:
+    competences[key] = dataComp[key]
+
+
+def fillTableCompetences(tableName, competences):
+    """ Заполняем таблицу компетенций """
+    table = soup.find(name='table:table', attrs={'table:name':tableName})
+    rows = table.findAll(name='table:table-row')
+    lastRow = rows[-1]
+    for key in competences:
+        newRow = copy.copy(lastRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')):
+            string = item.parent.string
+            item.parent.string = string.format(**competences[key])
+        table.insert(-1, newRow)
+    lastRow.extract()
+
+
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
+import copy
 
-# Заменяем теги значениями из словаря dTag
+
 with open(os.path.join(folder, fileIn), "r") as file:
     soup = BeautifulSoup(file.read(), features="xml")
 
+# таблицы компетенций
+fillTableCompetences('tblCompAnn', competences)
+fillTableCompetences('tblCompMain', competences)
 
+# Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
     string = item.parent.string
     item.parent.string = string.format(**dTag)
@@ -144,51 +174,6 @@ for item in soup.findAll(text=re.compile('{*\w}')):
 with open(os.path.join(folder, fileOut), "w") as file:
     file.write(str(soup))
 
-
-# Работа с таблицами
-
-doc = """
-<office:body xmlns:office="dfs" xmlns:text="text">
-<text:p text:style-name="P18">РАБОЧАЯ ПРОГРАММА ДИСЦИПЛИНЫ </text:p>
-<text:p text:style-name="P17"/>
-<text:p text:style-name="P20">{Name}</text:p>
-<text:p text:style-name="P17"/>
-<text:p text:style-name="P17"/>
-<text:p text:style-name="P18">Направление подготовки</text:p>
-<text:p text:style-name="P20">{ProgramCode} {ProgramDirection}</text:p>
-<text:p text:style-name="P18"/>
-<text:p text:style-name="P18">Направленность (профиль) образовательной программы</text:p>
-<text:p text:style-name="P20">{ProgramProfile}</text:p>
-<text:p text:style-name="P18"/>
-<text:p text:style-name="P18"/>
-<text:p text:style-name="P18">Уровень высшего образования</text:p>
-<text:p text:style-name="P20">{ProgramLevel}</text:p>
-</office:body>
-"""
-soup = BeautifulSoup(doc, features="xml")
-print(soup.prettify())
-
-row = ans.parent.parent
-table = row.parent
-
-
-import copy
-row2 = copy.copy(row)
-row.insert_after(row2)
-
-soup_string = str(soup)
-
-print(soup.prettify())
-
-#tabCompetences = tabCompetencesPrefix
-#for key in data['Competences']:
-#    comp = Competences[key]
-#    row = tabCompetencesRow.replace('{Code}', comp['Code'])
-#    row = row.replace('{Comp}', comp['Comp'])
-#    row = row.replace('{Indicators}', comp['Indicators'])
-#    row = row.replace('{Results}', comp['Results'])
-#    tabCompetences = tabCompetences + row
-#tabCompetences = tabCompetences + tabCompetencesSuffix
 
 
 
