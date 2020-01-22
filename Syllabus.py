@@ -24,7 +24,7 @@ def GetJsonFromFile(filePath):
     contents = ""
     fh = open(filePath)
     for line in fh:
-        cleanedLine = line.split("//", 1)[0]
+        cleanedLine = line.split("///", 1)[0]
         if len(cleanedLine) > 0 and line.endswith("\n") and "\n" not in cleanedLine:
             cleanedLine += "\n"
         contents += cleanedLine
@@ -152,6 +152,43 @@ def fillTableCompetences(tableName, competences):
     lastRow.extract()
 
 
+def fillTableLiterature(Base, Additional):
+    """ Заполняем таблицу литературы """
+    table = soup.find(name='table:table', attrs={'table:name':'tblLiterature'})
+    rows = table.findAll(name='table:table-row')
+    groupRow = rows[-2]
+    itemRow = rows[-1]
+    # Основная литература
+    newRow = copy.copy(groupRow)
+    item = newRow.find(text=re.compile('{*\w}'))
+    item.parent.string = 'Основная литература'
+    table.insert(-1, newRow)
+    for n in range(len(Base)):
+        book = copy.copy(Base[n])
+        book['n'] = str(n+1)
+        newRow = copy.copy(itemRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')):
+            string = item.parent.string
+            item.parent.string = string.format(**book)
+        table.insert(-1, newRow)
+    # Дополнительная литература
+    newRow = copy.copy(groupRow)
+    item = newRow.find(text=re.compile('{*\w}'))
+    item.parent.string = 'Дополнительная литература'
+    table.insert(-1, newRow)
+    for n in range(len(Additional)):
+        book = copy.copy(Additional[n])
+        book['n'] = str(n+1)
+        newRow = copy.copy(itemRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')):
+            string = item.parent.string
+            item.parent.string = string.format(**book)
+        table.insert(-1, newRow)
+    # удаляем первые две служебные строки-заготовки
+    groupRow.extract()
+    itemRow.extract()
+
+
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
 fileIn = 'layout.fodt'
@@ -165,6 +202,9 @@ with open(os.path.join(folder, fileIn), "r") as file:
 # таблицы компетенций
 fillTableCompetences('tblCompAnn', competences)
 fillTableCompetences('tblCompMain', competences)
+
+fillTableLiterature(data['LiteratureBase'], data['LiteratureAdditional'])
+
 
 # Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
