@@ -12,6 +12,7 @@ Created on Mon Oct  7 18:32:23 2019
 import os
 import json
 from bs4 import BeautifulSoup
+import copy
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
@@ -50,6 +51,24 @@ def iterData(dataJSON, keyPrefix=''):
         Data = {keyPrefix:dataJSON}
     return Data
 
+def isHoursRight(dataJSON):
+    """ Проверка часов, суммы должны совпадать
+    Проходим по структуре data['Sections'], суммируем часы в счетчики, сверяем с VolumeContact* """
+    volume = copy.copy(dataJSON['volume']['contact'])
+    for section in dataJSON['sections']:
+        for topic in section['topics']:
+            volume['lections'] -=  topic['hours']
+            if 'laboratory' in topic.keys():
+                for lab in topic['laboratory']:
+                    volume['laboratory'] -=  lab['hours']
+    total = 0
+    for key in volume.keys():
+        total += volume[key]
+    if total==0:
+        return True
+    else:
+        return False
+
 """ ! как поставить в соответствие теги в документе и в json?
 Единообразно не получится, т.к. есть табличные данные (list для лекций) и единичные (Name, Year)
 
@@ -65,6 +84,8 @@ fileJSON = 'НЭ ЭК КА.json'
 
 raw = GetJsonFromFile(os.path.join(folder, fileJSON))
 dataJSON = json.loads(raw)
+if not isHoursRight(dataJSON):
+    raise ValueError('Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
 
 data = iterData(dataJSON)
 dTag = {} # Здесь будут только единичные данные (не списки)
@@ -151,7 +172,6 @@ def fillTableCompetences(tableName, competences):
         table.insert(-1, newRow)
     lastRow.extract()
 
-
 def fillTableLiterature(Base, Additional):
     """ Заполняем таблицу литературы """
     table = soup.find(name='table:table', attrs={'table:name':'tblLiterature'})
@@ -188,13 +208,36 @@ def fillTableLiterature(Base, Additional):
     groupRow.extract()
     itemRow.extract()
 
+def fillTableLections(Sections):
+    """ Заполняем таблицу tblLections """
+    table = soup.find(name='table:table', attrs={'table:name':'tblLections'})
+    rows = table.findAll(name='table:table-row')
+    groupRow = rows[-2]
+    itemRow = rows[-1]
+    #
+    newRow = copy.copy(groupRow)
+    item = newRow.find(text=re.compile('{*\w}'))
+    item.parent.string = 'Основная литература'
+    table.insert(-1, newRow)
+    for n in range(len(Base)):
+        book = copy.copy(Base[n])
+        book['n'] = str(n+1)
+        newRow = copy.copy(itemRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')):
+            string = item.parent.string
+            item.parent.string = string.format(**book)
+        table.insert(-1, newRow)
+
+    # удаляем первые две служебные строки-заготовки
+    groupRow.extract()
+    itemRow.extract()
+
+
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
-import copy
-
 
 with open(os.path.join(folder, fileIn), "r") as file:
     soup = BeautifulSoup(file.read(), features="xml")
@@ -204,6 +247,7 @@ fillTableCompetences('tblCompAnn', competences)
 fillTableCompetences('tblCompMain', competences)
 
 fillTableLiterature(data['LiteratureBase'], data['LiteratureAdditional'])
+
 
 
 # Заменяем теги значениями из словаря dTag
