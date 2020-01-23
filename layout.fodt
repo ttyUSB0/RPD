@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2020-01-01T08:53:58.291029590</meta:creation-date><dc:date>2020-01-22T15:25:32.549729956</dc:date><meta:editing-duration>P1DT19H41M17S</meta:editing-duration><meta:editing-cycles>34</meta:editing-cycles><meta:generator>LibreOffice/5.2.7.2$Linux_X86_64 LibreOffice_project/20m0$Build-2</meta:generator><meta:document-statistic meta:table-count="11" meta:image-count="0" meta:object-count="0" meta:page-count="8" meta:paragraph-count="226" meta:word-count="994" meta:character-count="9629" meta:non-whitespace-character-count="8786"/></office:meta>
+ <office:meta><meta:creation-date>2020-01-01T08:53:58.291029590</meta:creation-date><dc:date>2020-01-23T10:13:32.415665566</dc:date><meta:editing-duration>P2DT13H38M8S</meta:editing-duration><meta:editing-cycles>35</meta:editing-cycles><meta:generator>LibreOffice/5.2.7.2$Linux_X86_64 LibreOffice_project/20m0$Build-2</meta:generator><meta:document-statistic meta:table-count="12" meta:image-count="0" meta:object-count="0" meta:page-count="8" meta:paragraph-count="235" meta:word-count="1006" meta:character-count="9714" meta:non-whitespace-character-count="8867"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">163123</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">156508</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
    <config:config-item config:name="ViewAreaWidth" config:type="long">18722</config:config-item>
    <config:config-item config:name="ViewAreaHeight" config:type="long">17298</config:config-item>
@@ -13,12 +13,12 @@
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">3591</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">175800</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">7022</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">167291</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">163123</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">156508</config:config-item>
      <config:config-item config:name="VisibleRight" config:type="long">18720</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">180419</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">173805</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -69,7 +69,7 @@
    <config:config-item config:name="InvertBorderSpacing" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">3398237</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">3576322</config:config-item>
    <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
    <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
@@ -615,6 +615,30 @@
   <style:style style:name="tblInfoSystems.B5" style:family="table-cell">
    <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
   </style:style>
+  <style:style style:name="tblLections" style:family="table">
+   <style:table-properties style:width="17cm" table:align="margins" style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="tblLections.A" style:family="table-column">
+   <style:table-column-properties style:column-width="1.092cm" style:rel-column-width="619*"/>
+  </style:style>
+  <style:style style:name="tblLections.B" style:family="table-column">
+   <style:table-column-properties style:column-width="6.516cm" style:rel-column-width="3694*"/>
+  </style:style>
+  <style:style style:name="tblLections.C" style:family="table-column">
+   <style:table-column-properties style:column-width="9.393cm" style:rel-column-width="5325*"/>
+  </style:style>
+  <style:style style:name="tblLections.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="tblLections.C1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="tblLections.A2" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="tblLections.B2" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
   <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
    <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" fo:break-before="page"/>
    <style:text-properties style:use-window-font-color="true" officeooo:rsid="000d727c" officeooo:paragraph-rsid="000d727c"/>
@@ -902,11 +926,20 @@
   <style:style style:name="P81" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties fo:font-weight="bold" officeooo:rsid="00332fce" officeooo:paragraph-rsid="00332fce" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="P82" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+  <style:style style:name="P82" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="0033da5d" officeooo:paragraph-rsid="0033da5d"/>
+  </style:style>
+  <style:style style:name="P83" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00357b1f" officeooo:paragraph-rsid="00357b1f"/>
+  </style:style>
+  <style:style style:name="P84" style:family="paragraph" style:parent-style-name="Table_20_Heading">
    <style:text-properties officeooo:rsid="00303c92" officeooo:paragraph-rsid="00328f92"/>
   </style:style>
-  <style:style style:name="P83" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+  <style:style style:name="P85" style:family="paragraph" style:parent-style-name="Table_20_Heading">
    <style:text-properties officeooo:rsid="00332fce" officeooo:paragraph-rsid="00332fce"/>
+  </style:style>
+  <style:style style:name="P86" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:text-properties officeooo:rsid="0033da5d" officeooo:paragraph-rsid="0033da5d"/>
   </style:style>
   <style:style style:name="T1" style:family="text">
    <style:text-properties fo:color="#0000cc"/>
@@ -1085,7 +1118,7 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:header>
-    <text:p text:style-name="Header"><text:page-number text:select-page="current">5</text:page-number></text:p>
+    <text:p text:style-name="Header"><text:page-number text:select-page="current">6</text:page-number></text:p>
    </style:header>
    <style:header-first>
     <text:p text:style-name="Header_20_left"/>
@@ -1474,16 +1507,16 @@
     <table:table-header-rows>
      <table:table-row>
       <table:table-cell table:style-name="tblCompMain.A1" office:value-type="string">
-       <text:p text:style-name="P82">Код компе-тенции</text:p>
+       <text:p text:style-name="P84">Код компе-тенции</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblCompMain.A1" office:value-type="string">
-       <text:p text:style-name="P82">Содержание компетенции</text:p>
+       <text:p text:style-name="P84">Содержание компетенции</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblCompMain.A1" office:value-type="string">
-       <text:p text:style-name="P82">Индикаторы достижения компетенции</text:p>
+       <text:p text:style-name="P84">Индикаторы достижения компетенции</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblCompMain.D1" office:value-type="string">
-       <text:p text:style-name="P82">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
+       <text:p text:style-name="P84">Планируемые результаты обучения по дисциплине, соотнесённые с установленными в программе индикаторами достижения компетенции</text:p>
       </table:table-cell>
      </table:table-row>
     </table:table-header-rows>
@@ -1792,7 +1825,47 @@
    <text:p text:style-name="Text_20_body"><text:span text:style-name="T5">а</text:span><text:span text:style-name="T4">) очная форма</text:span></text:p>
    <text:p text:style-name="P15"><text:span text:style-name="T14">Table</text:span>Sections</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20471_867385814"/>Занятия лекционного типа<text:bookmark-end text:name="__RefHeading___Toc20471_867385814"/></text:h>
-   <text:p text:style-name="P13">TableLections</text:p>
+   <table:table table:name="tblLections" table:style-name="tblLections">
+    <table:table-column table:style-name="tblLections.A"/>
+    <table:table-column table:style-name="tblLections.B"/>
+    <table:table-column table:style-name="tblLections.C"/>
+    <table:table-header-rows>
+     <table:table-row>
+      <table:table-cell table:style-name="tblLections.A1" office:value-type="string">
+       <text:p text:style-name="P86">№ темы</text:p>
+      </table:table-cell>
+      <table:table-cell table:style-name="tblLections.A1" office:value-type="string">
+       <text:p text:style-name="P86">Раздел/тема </text:p>
+       <text:p text:style-name="P86">дисциплины</text:p>
+      </table:table-cell>
+      <table:table-cell table:style-name="tblLections.C1" office:value-type="string">
+       <text:p text:style-name="P86">Краткое содержание</text:p>
+       <text:p text:style-name="P86">лекционного занятия</text:p>
+      </table:table-cell>
+     </table:table-row>
+    </table:table-header-rows>
+    <table:table-row>
+     <table:table-cell table:style-name="tblLections.A2" office:value-type="string">
+      <text:p text:style-name="P82">{n}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="tblLections.B2" table:number-columns-spanned="2" office:value-type="string">
+      <text:p text:style-name="P82">{section}</text:p>
+     </table:table-cell>
+     <table:covered-table-cell/>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="tblLections.A2" office:value-type="string">
+      <text:p text:style-name="P83">{n}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="tblLections.A2" office:value-type="string">
+      <text:p text:style-name="P83">{lection}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="tblLections.B2" office:value-type="string">
+      <text:p text:style-name="P83">{content}</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:p text:style-name="P13"/>
    <text:h text:style-name="P69" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20473_867385814"/>Занятия семинарского типа<text:bookmark-end text:name="__RefHeading___Toc20473_867385814"/></text:h>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc20475_867385814"/>Оценочные материалы для проведения текущего контроля и промежуточной аттестации обучающихся по дисциплине<text:bookmark-end text:name="__RefHeading___Toc20475_867385814"/></text:h>
    <text:p text:style-name="Text_20_body_20_indent">Оценочные материалы для текущего контроля успеваемости и промежуточной аттестации по итогам освоения дисциплины «<text:span text:style-name="T10">{Name}</text:span>» сформированы в виде фонда оценочных средств (ФОС) <text:s/>и представлены в приложении к рабочей программе.</text:p>
@@ -1806,16 +1879,16 @@
     <table:table-header-rows>
      <table:table-row>
       <table:table-cell table:style-name="tblLiterature.A1" office:value-type="string">
-       <text:p text:style-name="P83">№ п.п.</text:p>
+       <text:p text:style-name="P85">№ п.п.</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblLiterature.A1" office:value-type="string">
-       <text:p text:style-name="P83">Наименование</text:p>
+       <text:p text:style-name="P85">Наименование</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblLiterature.A1" office:value-type="string">
-       <text:p text:style-name="P83">Электронный адрес</text:p>
+       <text:p text:style-name="P85">Электронный адрес</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblLiterature.D1" office:value-type="string">
-       <text:p text:style-name="P83">Кол-во экз.</text:p>
+       <text:p text:style-name="P85">Кол-во экз.</text:p>
       </table:table-cell>
      </table:table-row>
     </table:table-header-rows>
@@ -1833,6 +1906,7 @@
       <text:p text:style-name="Table_20_Contents"/>
      </table:table-cell>
     </table:table-row>
+    <text:soft-page-break/>
     <table:table-row>
      <table:table-cell table:style-name="tblLiterature.A3" office:value-type="string">
       <text:p text:style-name="P79">{n}</text:p>
@@ -1849,17 +1923,17 @@
     </table:table-row>
    </table:table>
    <text:p text:style-name="P14"/>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:soft-page-break/>Перечень современных профессиональных баз данных и информационных справочных систем, необходимых для освоения дисциплины</text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Перечень современных профессиональных баз данных и информационных справочных систем, необходимых для освоения дисциплины</text:h>
    <table:table table:name="tblInfoSystems" table:style-name="tblInfoSystems">
     <table:table-column table:style-name="tblInfoSystems.A"/>
     <table:table-column table:style-name="tblInfoSystems.B"/>
     <table:table-header-rows>
      <table:table-row>
       <table:table-cell table:style-name="tblInfoSystems.A1" office:value-type="string">
-       <text:p text:style-name="P83">№ п.п.</text:p>
+       <text:p text:style-name="P85">№ п.п.</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="tblInfoSystems.B1" office:value-type="string">
-       <text:p text:style-name="P83">Наименование</text:p>
+       <text:p text:style-name="P85">Наименование</text:p>
       </table:table-cell>
      </table:table-row>
     </table:table-header-rows>
@@ -1928,13 +2002,13 @@
      <text:p text:style-name="P74">систематизацию и закрепление полученных теоретических знаний;</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P74">развитие познавательных способностей, активности, самостоятельности, ответственности и организованности обучающихся;</text:p>
+     <text:p text:style-name="P74"><text:soft-page-break/>развитие познавательных способностей, активности, самостоятельности, ответственности и организованности обучающихся;</text:p>
     </text:list-item>
     <text:list-item>
      <text:p text:style-name="P74">формирование самостоятельности мышления, способностей к саморазвитию, самосовершенствованию и самореализации.</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P72">Чтобы выполнить весь объем самостоятельной работы по всем осваиваемым дисциплинам, обучающемуся необходимо заниматься по 3-5 часов ежедневно. Начинать самостоятельные <text:soft-page-break/>внеаудиторные занятия следует с первых же дней семестра, поскольку компенсировать пропущенный материал позднее без снижения качества работы и её производительности практически невозможно.</text:p>
+   <text:p text:style-name="P72">Чтобы выполнить весь объем самостоятельной работы по всем осваиваемым дисциплинам, обучающемуся необходимо заниматься по 3-5 часов ежедневно. Начинать самостоятельные внеаудиторные занятия следует с первых же дней семестра, поскольку компенсировать пропущенный материал позднее без снижения качества работы и её производительности практически невозможно.</text:p>
    <text:p text:style-name="P72"/>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc20485_867385814"/>Перечень оборудования и технических средств обучения, необходимых для осуществления образовательного процесса по дисциплине<text:bookmark-end text:name="__RefHeading___Toc20485_867385814"/></text:h>
    <text:p text:style-name="Text_20_body"/>

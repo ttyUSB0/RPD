@@ -159,7 +159,7 @@ for key in data['Competences']:
     competences[key] = dataComp[key]
 
 
-def fillTableCompetences(tableName, competences):
+def fillTableCompetences(soup, tableName, competences):
     """ Заполняем таблицу компетенций """
     table = soup.find(name='table:table', attrs={'table:name':tableName})
     rows = table.findAll(name='table:table-row')
@@ -172,7 +172,7 @@ def fillTableCompetences(tableName, competences):
         table.insert(-1, newRow)
     lastRow.extract()
 
-def fillTableLiterature(Base, Additional):
+def fillTableLiterature(soup, Base, Additional):
     """ Заполняем таблицу литературы """
     table = soup.find(name='table:table', attrs={'table:name':'tblLiterature'})
     rows = table.findAll(name='table:table-row')
@@ -208,26 +208,36 @@ def fillTableLiterature(Base, Additional):
     groupRow.extract()
     itemRow.extract()
 
-def fillTableLections(Sections):
-    """ Заполняем таблицу tblLections """
+def fillTableLections(soup, Sections):
+    """ Заполняем таблицу tblLections
+    Проходим по структуре data['Sections'] """
     table = soup.find(name='table:table', attrs={'table:name':'tblLections'})
+    if table is None:
+        raise NameError('tblLections not found!')
     rows = table.findAll(name='table:table-row')
     groupRow = rows[-2]
     itemRow = rows[-1]
     #
-    newRow = copy.copy(groupRow)
-    item = newRow.find(text=re.compile('{*\w}'))
-    item.parent.string = 'Основная литература'
-    table.insert(-1, newRow)
-    for n in range(len(Base)):
-        book = copy.copy(Base[n])
-        book['n'] = str(n+1)
-        newRow = copy.copy(itemRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')):
+    nSection = 1
+    for section in Sections:
+        s = {'n':str(nSection), 'section':section['name']}
+        newRow = copy.copy(groupRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')): #
             string = item.parent.string
-            item.parent.string = string.format(**book)
+            item.parent.string = string.format(**s)
         table.insert(-1, newRow)
 
+        nTopic = 1
+        for topic in section['topics']:
+            newRow = copy.copy(itemRow)
+            t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
+                 'content':topic['content']}
+            for item in newRow.findAll(text=re.compile('{*\w}')): #
+                string = item.parent.string
+                item.parent.string = string.format(**t)
+            table.insert(-1, newRow)
+            nTopic += 1
+        nSection += 1
     # удаляем первые две служебные строки-заготовки
     groupRow.extract()
     itemRow.extract()
@@ -243,12 +253,11 @@ with open(os.path.join(folder, fileIn), "r") as file:
     soup = BeautifulSoup(file.read(), features="xml")
 
 # таблицы компетенций
-fillTableCompetences('tblCompAnn', competences)
-fillTableCompetences('tblCompMain', competences)
+fillTableCompetences(soup, 'tblCompAnn', competences)
+fillTableCompetences(soup, 'tblCompMain', competences)
 
-fillTableLiterature(data['LiteratureBase'], data['LiteratureAdditional'])
-
-
+fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
+fillTableLections(soup, data['Sections'])
 
 # Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
