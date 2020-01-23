@@ -55,12 +55,17 @@ def isHoursRight(dataJSON):
     """ Проверка часов, суммы должны совпадать
     Проходим по структуре data['Sections'], суммируем часы в счетчики, сверяем с VolumeContact* """
     volume = copy.copy(dataJSON['volume']['contact'])
+    volume['theoretical'] = dataJSON['volume']['independent']['theoretical']
+
     for section in dataJSON['sections']:
         for topic in section['topics']:
             volume['lections'] -=  topic['hours']
             if 'laboratory' in topic.keys():
                 for lab in topic['laboratory']:
                     volume['laboratory'] -=  lab['hours']
+            if 'theoretical' in topic.keys():
+                volume['theoretical'] -=  topic['theoretical']
+
     total = 0
     for key in volume.keys():
         total += volume[key]
@@ -162,6 +167,8 @@ for key in data['Competences']:
 def fillTableCompetences(soup, tableName, competences):
     """ Заполняем таблицу компетенций """
     table = soup.find(name='table:table', attrs={'table:name':tableName})
+    if table is None:
+        raise NameError(tableName + ' not found!')
     rows = table.findAll(name='table:table-row')
     lastRow = rows[-1]
     for key in competences:
@@ -175,6 +182,8 @@ def fillTableCompetences(soup, tableName, competences):
 def fillTableLiterature(soup, Base, Additional):
     """ Заполняем таблицу литературы """
     table = soup.find(name='table:table', attrs={'table:name':'tblLiterature'})
+    if table is None:
+        raise NameError('tblLiterature not found!')
     rows = table.findAll(name='table:table-row')
     groupRow = rows[-2]
     itemRow = rows[-1]
@@ -220,7 +229,7 @@ def fillTableLections(soup, Sections):
     #
     nSection = 1
     for section in Sections:
-        s = {'n':str(nSection), 'section':section['name']}
+        s = {'n':str(nSection), 'section':section['name'].upper()}
         newRow = copy.copy(groupRow)
         for item in newRow.findAll(text=re.compile('{*\w}')): #
             string = item.parent.string
@@ -242,7 +251,83 @@ def fillTableLections(soup, Sections):
     groupRow.extract()
     itemRow.extract()
 
+def fillTableSections(soup, Sections, competences):
+    """ Заполняем таблицу tblSections
+    Проходим по структуре data['Sections'] """
+    table = soup.find(name='table:table', attrs={'table:name':'tblSections'})
+    if table is None:
+        raise NameError('tblSections not found!')
+    rows = table.findAll(name='table:table-row')
+    groupRow = rows[-2]
+    itemRow = rows[-1]
+    #
+    nLection = 0
+    nSeminar = 0
+    nLaboratory = 0
+    nIndependent = 0
+    nSection = 1
+    for section in Sections:
+        s = {'n':str(nSection), 'section':section['name'].upper(),
+                 'competences': ', '.join(competences)}
+        newRow = copy.copy(groupRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')): #
+            string = item.parent.string
+            item.parent.string = string.format(**s)
+        table.insert(-1, newRow)
 
+        nTopic = 1
+        for topic in section['topics']:
+            newRow = copy.copy(itemRow)
+            vLection = topic['hours']
+            vSeminar = 0
+            if 'seminar' in topic.keys():
+                for item in topic['seminar']:
+                    vSeminar += item['hours']
+            vLaboratory = 0
+            if 'laboratory' in topic.keys():
+                for item in topic['laboratory']:
+                    vLaboratory += item['hours']
+            vIndependent = 0
+            if 'theoretical' in topic.keys():
+                vIndependent += topic['theoretical']
+            nLection += vLection
+            nSeminar += vSeminar
+            nLaboratory += vLaboratory
+            nIndependent += vIndependent
+            if vSeminar==0:
+                vSeminar = '-'
+            if vLaboratory==0:
+                vLaboratory = '-'
+            if vIndependent==0:
+                vIndependent = '-'
+
+            t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
+                 'vLection':str(vLection), 'vSeminar':str(vSeminar),
+                 'vLaboratory':str(vLaboratory), 'vIndependent':str(vIndependent)}
+            for item in newRow.findAll(text=re.compile('{*\w}')): #
+                string = item.parent.string
+                item.parent.string = string.format(**t)
+            table.insert(-1, newRow)
+            nTopic += 1
+        nSection += 1
+
+    t = {'n':'', 'lection':'Итого в семестр:',
+     'vLection':str(nLection), 'vSeminar':str(nSeminar),
+     'vLaboratory':str(nLaboratory), 'vIndependent':str(nIndependent)}
+    newRow = copy.copy(itemRow)
+    for item in newRow.findAll(text=re.compile('{*\w}')): #
+        string = item.parent.string
+        item.parent.string = string.format(**t)
+    table.insert(-1, newRow)
+    t['lection'] = 'Всего:'
+    newRow = copy.copy(itemRow)
+    for item in newRow.findAll(text=re.compile('{*\w}')): #
+        string = item.parent.string
+        item.parent.string = string.format(**t)
+    table.insert(-1, newRow)
+    # удаляем первые две служебные строки-заготовки
+    groupRow.extract()
+    itemRow.extract()
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
@@ -258,6 +343,7 @@ fillTableCompetences(soup, 'tblCompMain', competences)
 
 fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
 fillTableLections(soup, data['Sections'])
+fillTableSections(soup, data['Sections'], data['Competences'])
 
 # Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
