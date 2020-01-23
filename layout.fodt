@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2020-01-01T08:53:58.291029590</meta:creation-date><dc:date>2020-01-23T13:58:46.399463730</dc:date><meta:editing-duration>P2DT16H9M40S</meta:editing-duration><meta:editing-cycles>40</meta:editing-cycles><meta:generator>LibreOffice/5.2.7.2$Linux_X86_64 LibreOffice_project/20m0$Build-2</meta:generator><meta:document-statistic meta:table-count="14" meta:image-count="0" meta:object-count="0" meta:page-count="8" meta:paragraph-count="265" meta:word-count="1059" meta:character-count="10178" meta:non-whitespace-character-count="9308"/></office:meta>
+ <office:meta><meta:creation-date>2020-01-01T08:53:58.291029590</meta:creation-date><dc:date>2020-01-23T15:19:48.051029026</dc:date><meta:editing-duration>P2DT16H40M10S</meta:editing-duration><meta:editing-cycles>43</meta:editing-cycles><meta:generator>LibreOffice/5.2.7.2$Linux_X86_64 LibreOffice_project/20m0$Build-2</meta:generator><meta:document-statistic meta:table-count="15" meta:image-count="0" meta:object-count="0" meta:page-count="9" meta:paragraph-count="275" meta:word-count="1170" meta:character-count="11168" meta:non-whitespace-character-count="10197"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">181504</config:config-item>
-   <config:config-item config:name="ViewAreaLeft" config:type="long">1852</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">18722</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">17298</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">232569</config:config-item>
+   <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">32182</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">19119</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">10502</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">186491</config:config-item>
-     <config:config-item config:name="VisibleLeft" config:type="long">1852</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">181504</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">20572</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">198801</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">17519</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">229455</config:config-item>
+     <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">232569</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">32180</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">251686</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -69,7 +69,7 @@
    <config:config-item config:name="InvertBorderSpacing" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">3765365</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">3911472</config:config-item>
    <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
    <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
@@ -156,7 +156,7 @@
    <style:text-properties style:font-name="Liberation Serif1" fo:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" fo:font-size="14pt" style:font-name-asian="AR PL SungtiL GB" style:font-family-asian="&apos;AR PL SungtiL GB&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="14pt" style:font-name-complex="FreeSans" style:font-family-complex="FreeSans" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="14pt"/>
   </style:style>
   <style:style style:name="Text_20_body" style:display-name="Text body" style:family="paragraph" style:parent-style-name="Standard" style:class="text">
-   <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" loext:contextual-spacing="false" fo:line-height="120%" fo:text-align="justify" style:justify-single-word="false" fo:text-indent="0cm" style:auto-text-indent="false" style:writing-mode="page"/>
+   <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" loext:contextual-spacing="false" fo:line-height="110%" fo:text-align="justify" style:justify-single-word="false" fo:text-indent="0cm" style:auto-text-indent="false" style:writing-mode="page"/>
    <style:text-properties style:font-size-asian="10.5pt"/>
   </style:style>
   <style:style style:name="List" style:family="paragraph" style:parent-style-name="Text_20_body" style:class="list">
@@ -702,6 +702,27 @@
   <style:style style:name="tblLaboratory.B2" style:family="table-cell">
    <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
   </style:style>
+  <style:style style:name="tblClasses" style:family="table">
+   <style:table-properties style:width="17cm" table:align="margins" style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="tblClasses.A" style:family="table-column">
+   <style:table-column-properties style:column-width="2.91cm" style:rel-column-width="1650*"/>
+  </style:style>
+  <style:style style:name="tblClasses.B" style:family="table-column">
+   <style:table-column-properties style:column-width="14.09cm" style:rel-column-width="7988*"/>
+  </style:style>
+  <style:style style:name="tblClasses.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="tblClasses.B1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="tblClasses.A2" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="tblClasses.B2" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
   <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
    <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" fo:break-before="page"/>
    <style:text-properties style:use-window-font-color="true" officeooo:rsid="000d727c" officeooo:paragraph-rsid="000d727c"/>
@@ -1019,17 +1040,29 @@
   <style:style style:name="P91" style:family="paragraph" style:parent-style-name="Table_20_Heading">
    <style:text-properties officeooo:rsid="003856d5" officeooo:paragraph-rsid="003856d5"/>
   </style:style>
-  <style:style style:name="P92" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P92" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:text-properties officeooo:rsid="003af236" officeooo:paragraph-rsid="003af236"/>
+  </style:style>
+  <style:style style:name="P93" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="0022cc55"/>
   </style:style>
-  <style:style style:name="P93" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P94" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:paragraph-rsid="00328f92"/>
   </style:style>
-  <style:style style:name="P94" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P95" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:paragraph-properties fo:break-before="page"/>
   </style:style>
-  <style:style style:name="P95" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P96" style:family="paragraph" style:parent-style-name="Text_20_body_20_indent">
+   <style:text-properties officeooo:rsid="00397475" officeooo:paragraph-rsid="00397475"/>
+  </style:style>
+  <style:style style:name="P97" style:family="paragraph" style:parent-style-name="Text_20_body_20_indent" style:list-style-name="L3">
+   <style:text-properties officeooo:rsid="00397475" officeooo:paragraph-rsid="00397475"/>
+  </style:style>
+  <style:style style:name="P98" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="003856d5" officeooo:paragraph-rsid="003856d5"/>
+  </style:style>
+  <style:style style:name="P99" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="003af236" officeooo:paragraph-rsid="003af236"/>
   </style:style>
   <style:style style:name="T1" style:family="text">
    <style:text-properties fo:color="#0000cc"/>
@@ -1081,6 +1114,12 @@
   </style:style>
   <style:style style:name="T17" style:family="text">
    <style:text-properties officeooo:rsid="0036e719"/>
+  </style:style>
+  <style:style style:name="T18" style:family="text">
+   <style:text-properties officeooo:rsid="00397475"/>
+  </style:style>
+  <style:style style:name="T19" style:family="text">
+   <style:text-properties officeooo:rsid="003afd48"/>
   </style:style>
   <style:style style:name="Sect1" style:family="section">
    <style:section-properties style:editable="false">
@@ -1191,6 +1230,58 @@
     </style:list-level-properties>
    </text:list-level-style-bullet>
   </text:list-style>
+  <text:list-style style:name="L3">
+   <text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="2" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.905cm" fo:text-indent="-0.635cm" fo:margin-left="1.905cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="3" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.54cm" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="4" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="3.175cm" fo:text-indent="-0.635cm" fo:margin-left="3.175cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="5" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="3.81cm" fo:text-indent="-0.635cm" fo:margin-left="3.81cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="6" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="4.445cm" fo:text-indent="-0.635cm" fo:margin-left="4.445cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="7" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="5.08cm" fo:text-indent="-0.635cm" fo:margin-left="5.08cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="8" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="5.715cm" fo:text-indent="-0.635cm" fo:margin-left="5.715cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="9" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.35cm" fo:text-indent="-0.635cm" fo:margin-left="6.35cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="10" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.985cm" fo:text-indent="-0.635cm" fo:margin-left="6.985cm"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+  </text:list-style>
   <style:page-layout style:name="pm1">
    <style:page-layout-properties fo:page-width="21.001cm" fo:page-height="29.7cm" style:num-format="1" style:print-orientation="portrait" fo:margin-top="2cm" fo:margin-bottom="2cm" fo:margin-left="2cm" fo:margin-right="2cm" style:writing-mode="lr-tb" draw:fill-image-width="0cm" draw:fill-image-height="0cm" style:footnote-max-height="0cm">
     <style:footnote-sep style:width="0.018cm" style:distance-before-sep="0.101cm" style:distance-after-sep="0.101cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:color="#000000"/>
@@ -1211,7 +1302,7 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:header>
-    <text:p text:style-name="Header"><text:page-number text:select-page="current">8</text:page-number></text:p>
+    <text:p text:style-name="Header"><text:page-number text:select-page="current">9</text:page-number></text:p>
    </style:header>
    <style:header-first>
     <text:p text:style-name="Header_20_left"/>
@@ -1781,7 +1872,6 @@
       <text:p text:style-name="P87">{VolumeContactDesign}</text:p>
      </table:table-cell>
     </table:table-row>
-    <text:soft-page-break/>
     <table:table-row>
      <table:table-cell table:style-name="TableVolume.A20" office:value-type="string">
       <text:p text:style-name="P65"><text:s text:c="3"/><text:span text:style-name="T5">групповые консультации</text:span></text:p>
@@ -1793,6 +1883,7 @@
       <text:p text:style-name="P88">{VolumeContactConsultations}</text:p>
      </table:table-cell>
     </table:table-row>
+    <text:soft-page-break/>
     <table:table-row table:style-name="TableVolume.15">
      <table:table-cell table:style-name="TableVolume.A20" office:value-type="string">
       <text:p text:style-name="P65"><text:s text:c="3"/><text:span text:style-name="T5">индивидуальная работа с преподавателем</text:span></text:p>
@@ -2002,6 +2093,20 @@
      </table:table-cell>
     </table:table-row>
    </table:table>
+   <text:p text:style-name="Text_20_body_20_indent">Программой дисциплины «{Name}» предусмотрены занятия лекционного типа, занятия семинарского типа и самостоятельная работа обучающихся. На занятиях семинарского типа выполняются !!!! практические работы и лабораторные работы. Самостоятельная работа предполагает изучение обучающимися теоретического курса и курсовое проектирование. Курсовой проект/работа выполняется по индивидуальным заданиям. Примерный перечень тем курсового проекта/работы приводится в Фонде оценочных средств для проведения текущего контроля и промежуточной аттестации по дисциплине (ФОС), представленном в приложении к рабочей программе.</text:p>
+   <text:p text:style-name="Text_20_body_20_indent">Для запланированных видов занятий разработаны учебно-методические материалы, которые включены в состав электронного учебно-методического комплекса дисциплины (ЭУМКД) «<text:span text:style-name="T18">{Name}</text:span>» [5].</text:p>
+   <text:p text:style-name="P96">В ЭУМКД содержатся:</text:p>
+   <text:list xml:id="list6397494054574047186" text:style-name="L3">
+    <text:list-item>
+     <text:p text:style-name="P97"><text:soft-page-break/>Рабочая программа дисциплины; </text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P97">Рейтинг-план; </text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P97">Иные учебно-методические материалы, предусмотренные в РПД. </text:p>
+    </text:list-item>
+   </text:list>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20471_867385814"/>Занятия лекционного типа<text:bookmark-end text:name="__RefHeading___Toc20471_867385814"/></text:h>
    <table:table table:name="tblLections" table:style-name="tblLections">
     <table:table-column table:style-name="tblLections.A"/>
@@ -2043,7 +2148,7 @@
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:h text:style-name="P86" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20473_867385814"/><text:soft-page-break/>Занятия семинарского типа<text:bookmark-end text:name="__RefHeading___Toc20473_867385814"/></text:h>
+   <text:h text:style-name="P86" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20473_867385814"/>Занятия семинарского типа<text:bookmark-end text:name="__RefHeading___Toc20473_867385814"/></text:h>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Лабораторные работы</text:h>
    <table:table table:name="tblLaboratory" table:style-name="tblLaboratory">
     <table:table-column table:style-name="tblLaboratory.A"/>
@@ -2070,26 +2175,26 @@
     </table:table-header-rows>
     <table:table-row>
      <table:table-cell table:style-name="tblLaboratory.A2" office:value-type="string">
-      <text:p text:style-name="P95">{n}</text:p>
+      <text:p text:style-name="P98">{n}</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="tblLaboratory.B2" table:number-columns-spanned="3" office:value-type="string">
-      <text:p text:style-name="P95">{section}</text:p>
+      <text:p text:style-name="P98">{section}</text:p>
      </table:table-cell>
      <table:covered-table-cell/>
      <table:covered-table-cell/>
     </table:table-row>
     <table:table-row>
      <table:table-cell table:style-name="tblLaboratory.A2" office:value-type="string">
-      <text:p text:style-name="P95">{n}</text:p>
+      <text:p text:style-name="P98">{n}</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="tblLaboratory.A2" office:value-type="string">
-      <text:p text:style-name="P95">{lection}</text:p>
+      <text:p text:style-name="P98">{lection}</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="tblLaboratory.A2" office:value-type="string">
-      <text:p text:style-name="P95">{laboratory}</text:p>
+      <text:p text:style-name="P98">{laboratory}</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="tblLaboratory.B2" office:value-type="string">
-      <text:p text:style-name="P95">{content}</text:p>
+      <text:p text:style-name="P98">{content}</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
@@ -2175,7 +2280,7 @@
       <text:p text:style-name="P75">2</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="tblInfoSystems.B4" office:value-type="string">
-      <text:p text:style-name="P74">Лань : электронно-библиотечная система издательства : сайт. – Москва, 2010– . – URL: http://e.lanbook.com. (дата обращения: 04.10.2019). – Режим доступа: по подписке. – Текст : электронный.</text:p>
+      <text:p text:style-name="P74">Лань : электронно-библиотечная система издательства : сайт. – Москва, 2010– . – URL: http://e.lanbook.com. (дата обращения: 04.10.2019). – Режим доступа: по подписке. – Текст : <text:soft-page-break/>электронный.</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -2195,15 +2300,15 @@
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20483_867385814"/><text:soft-page-break/>Методические указания для обучающихся по освоению дисциплины<text:bookmark-end text:name="__RefHeading___Toc20483_867385814"/></text:h>
-   <text:p text:style-name="P16">Программой дисциплины «{Name}» предусмотрены занятия лекционного типа, занятия семинарского типа (практические и лабораторные работы) и самостоятельная работа обучающихся. Самостоятельная работа предполагает изучение теоретического курса и курсовое проектирование. В период освоения дисциплины для обучающихся организуются индивидуальные и групповые консультации.</text:p>
-   <text:p text:style-name="P16">При изучении дисциплины обязательным является выполнение следующих организационных требований:</text:p>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20483_867385814"/>Методические указания для обучающихся по освоению дисциплины<text:bookmark-end text:name="__RefHeading___Toc20483_867385814"/></text:h>
+   <text:p text:style-name="Text_20_body_20_indent">Программой дисциплины «{Name}» предусмотрены занятия лекционного типа, занятия семинарского типа (практические и лабораторные работы) и самостоятельная работа обучающихся. Самостоятельная работа предполагает изучение теоретического курса и курсовое проектирование. В период освоения дисциплины для обучающихся организуются индивидуальные и групповые консультации.</text:p>
+   <text:p text:style-name="Text_20_body_20_indent">При изучении дисциплины обязательным является выполнение следующих организационных требований:</text:p>
    <text:list xml:id="list5836609488072132852" text:style-name="L1">
     <text:list-item>
      <text:p text:style-name="P89">обязательное посещение всех видов аудиторных занятий;</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P89">ведение конспекта лекций, практических занятий;</text:p>
+     <text:p text:style-name="P89">ведение конспекта лекций, практических занятий <text:span text:style-name="T19">(при наличии)</text:span>;</text:p>
     </text:list-item>
     <text:list-item>
      <text:p text:style-name="P89">активная работа во время занятий;</text:p>
@@ -2218,7 +2323,7 @@
      <text:p text:style-name="P89">получение дополнительных консультаций по подготовке, оформлению и сдаче отдельных видов заданий, в случае пропусков занятий.</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P16">Самостоятельная работа обучающегося направлена на:</text:p>
+   <text:p text:style-name="Text_20_body_20_indent">Самостоятельная работа обучающегося направлена на:</text:p>
    <text:list xml:id="list6920002903873788436" text:style-name="L2">
     <text:list-item>
      <text:p text:style-name="P90">стимулирование познавательного интереса;</text:p>
@@ -2233,9 +2338,30 @@
      <text:p text:style-name="P90">формирование самостоятельности мышления, способностей к саморазвитию, самосовершенствованию и самореализации.</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P16">Чтобы выполнить весь объем самостоятельной работы по всем осваиваемым дисциплинам, обучающемуся необходимо заниматься по 3-5 часов ежедневно. Начинать самостоятельные внеаудиторные занятия следует с первых же дней семестра, поскольку компенсировать пропущенный материал позднее без снижения качества работы и её производительности практически невозможно.</text:p>
-   <text:p text:style-name="P16"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc20485_867385814"/>Перечень оборудования и технических средств обучения, необходимых для осуществления образовательного процесса по дисциплине<text:bookmark-end text:name="__RefHeading___Toc20485_867385814"/></text:h>
+   <text:p text:style-name="Text_20_body_20_indent">Чтобы выполнить весь объем самостоятельной работы по всем осваиваемым дисциплинам, обучающемуся необходимо заниматься по 3-5 часов ежедневно. Начинать самостоятельные внеаудиторные занятия следует с первых же дней семестра, поскольку компенсировать пропущенный материал позднее без снижения качества работы и её производительности практически невозможно.</text:p>
+   <table:table table:name="tblClasses" table:style-name="tblClasses">
+    <table:table-column table:style-name="tblClasses.A"/>
+    <table:table-column table:style-name="tblClasses.B"/>
+    <table:table-header-rows>
+     <table:table-row>
+      <table:table-cell table:style-name="tblClasses.A1" office:value-type="string">
+       <text:p text:style-name="P92">Вид учебных занятий</text:p>
+      </table:table-cell>
+      <table:table-cell table:style-name="tblClasses.B1" office:value-type="string">
+       <text:p text:style-name="P92">Организация деятельности студента</text:p>
+      </table:table-cell>
+     </table:table-row>
+    </table:table-header-rows>
+    <table:table-row>
+     <table:table-cell table:style-name="tblClasses.A2" office:value-type="string">
+      <text:p text:style-name="P99">{type}</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="tblClasses.B2" office:value-type="string">
+      <text:p text:style-name="P99">{text}</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc20485_867385814"/><text:soft-page-break/>Перечень оборудования и технических средств обучения, необходимых для осуществления образовательного процесса по дисциплине<text:bookmark-end text:name="__RefHeading___Toc20485_867385814"/></text:h>
    <text:p text:style-name="Text_20_body"/>
    <text:p text:style-name="Standard"/>
   </office:text>

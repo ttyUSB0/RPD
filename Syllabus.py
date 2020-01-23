@@ -86,6 +86,7 @@ def isHoursRight(dataJSON):
 # -------- Читаем JSONы
 fileCompetences = 'ЭККА компетенции.json'
 fileJSON = 'НЭ ЭК КА.json'
+fileClassesType = 'Виды занятий.json'
 
 raw = GetJsonFromFile(os.path.join(folder, fileJSON))
 dataJSON = json.loads(raw)
@@ -162,6 +163,25 @@ dataComp = json.loads(raw)
 competences = {}
 for key in data['Competences']:
     competences[key] = dataComp[key]
+
+raw = GetJsonFromFile(os.path.join(folder, fileClassesType))
+dataClasses = json.loads(raw)
+classes = []
+# contact
+for item in ('lections', 'laboratory', 'practical'):
+    if dataJSON['volume']['contact'][item]>0:
+        classes.append(item)
+# independent
+for item in ('theoretical', 'design', 'tasks', 'other'):
+    if dataJSON['volume']['independent'][item]>0:
+        classes.append(item)
+
+classesTypes = []
+for item in dataClasses:
+    if item['type'] in classes:
+        classesTypes.append(item)
+
+
 
 
 def fillTableCompetences(soup, tableName, competences):
@@ -329,6 +349,65 @@ def fillTableSections(soup, Sections, competences):
     groupRow.extract()
     itemRow.extract()
 
+def fillTableLaboratory(soup, Sections):
+    """ Заполняем таблицу tblLaboratory """
+    table = soup.find(name='table:table', attrs={'table:name':'tblLaboratory'})
+    if table is None:
+        raise NameError('tblLaboratory not found!')
+    rows = table.findAll(name='table:table-row')
+    groupRow = rows[-2]
+    itemRow = rows[-1]
+    #
+    nSection = 1
+    for section in Sections:
+        # Проверяем, есть ли лабораторки в темах
+        isLabExist = False
+        for topic in section['topics']:
+            if 'laboratory' in topic.keys():
+                isLabExist = True
+        if isLabExist: # в этой секции есть лабы
+            s = {'n':str(nSection), 'section':section['name'].upper()}
+            newRow = copy.copy(groupRow)
+            for item in newRow.findAll(text=re.compile('{*\w}')): #
+                string = item.parent.string
+                item.parent.string = string.format(**s)
+            table.insert(-1, newRow)
+
+            nTopic = 1
+            for topic in section['topics']:
+                if 'laboratory' in topic.keys():
+                    for lab in topic['laboratory']:
+                        newRow = copy.copy(itemRow)
+                        t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
+                         'laboratory':lab['name'], 'content':lab['content']}
+                        for item in newRow.findAll(text=re.compile('{*\w}')): #
+                            string = item.parent.string
+                            item.parent.string = string.format(**t)
+                        table.insert(-1, newRow)
+                nTopic += 1
+        nSection += 1
+    # удаляем первые две служебные строки-заготовки
+    groupRow.extract()
+    itemRow.extract()
+
+
+def fillTableClasses(soup, classesTypes):
+    """ Заполняем таблицу типов занятий """
+    table = soup.find(name='table:table', attrs={'table:name':'tblClasses'})
+    if table is None:
+        raise NameError('tblClasses not found!')
+    rows = table.findAll(name='table:table-row')
+    lastRow = rows[-1]
+    for item in classesTypes:
+        t = {'type':item['name'], 'text':item['text']}
+        newRow = copy.copy(lastRow)
+        for item in newRow.findAll(text=re.compile('{*\w}')):
+            string = item.parent.string
+            item.parent.string = string.format(**t)
+        table.insert(-1, newRow)
+    lastRow.extract()
+
+
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
 fileIn = 'layout.fodt'
@@ -337,13 +416,15 @@ fileOut = 'syllabus.fodt'
 with open(os.path.join(folder, fileIn), "r") as file:
     soup = BeautifulSoup(file.read(), features="xml")
 
-# таблицы компетенций
+# таблицы
 fillTableCompetences(soup, 'tblCompAnn', competences)
 fillTableCompetences(soup, 'tblCompMain', competences)
 
 fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
 fillTableLections(soup, data['Sections'])
 fillTableSections(soup, data['Sections'], data['Competences'])
+fillTableLaboratory(soup, data['Sections'])
+fillTableClasses(soup, classesTypes)
 
 # Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
