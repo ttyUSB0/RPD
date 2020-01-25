@@ -13,6 +13,7 @@ import os
 import json
 from bs4 import BeautifulSoup
 import copy
+import re
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 
@@ -87,10 +88,7 @@ def fillContents(Sections):
         Contents = Contents[:-2] + '); '
     return Contents[:-2]
 
-""" ! как поставить в соответствие теги в документе и в json?
-Единообразно не получится, т.к. есть табличные данные (list для лекций) и единичные (Name, Year)
-
- Работа с таблицами:
+""" Работа с таблицами:
  Ищем таблицу по имени
  берём последнюю строку, вырезаем её
  вставляем её, заменяя теги.
@@ -139,10 +137,12 @@ dTag['VolumeHoursTotal'] = (dTag['VolumeContactTotal']+
     dTag['VolumeIndependentTotal'])
 dTag['VolumePointsTotal'] = int(dTag['VolumeHoursTotal']/36)
 
-# Заменяем нули на минусы
-for (key, value) in dTag.items():
-    if key.startswith('Volume') and value==0:
-        dTag[key] = '-'
+for key in dTag.keys():
+    if key.startswith('VolumeContact') or key.startswith('VolumeIndependent'):
+        if dTag[key] == 0: # Заменяем нули на минусы
+            dTag[key] = '-'
+        else:
+            dTag[key] = '%.1f(%d)'%(dTag[key]/36, dTag[key])
 
 # Списки
 dTag['ConnectsWithList']=''
@@ -160,18 +160,25 @@ for item in data['Tasks']:
     dTag['Tasks']=dTag['Tasks']+' '+item+'; '
 dTag['Tasks'] = dTag['Tasks'][:-2] + '.'
 
-#TODO: спросить расшифровку кода УП, сформировать строку
-import re
-code = re.findall(r'[А-Я]+', data['CodeUp'])
-number = re.findall(r'\d+', data['CodeUp'])
 
-dTag['PartName'] = ''
-dTag['Type'] = ''
+dTag['CodeUp'] = data['CodeUp']
+dTag['PartName'] = 'входит в '
+CodeUp = data['CodeUp'].split('.')
+
+if CodeUp[0].startswith('Б'):
+    if CodeUp[1].startswith('Б'):
+        dTag['PartName'] += 'обязательную часть блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
+    elif CodeUp[1].startswith('В') :
+        dTag['PartName'] += 'часть, формируемую участниками образовательных отношений блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
+        if len(CodeUp) > 2: #    Б1.В.ДВ
+            dTag['PartName'] += ' и относится к дисциплинам по выбору студента'
+
+#import re
+#code = re.findall(r'[А-Я]+', data['CodeUp'])
+#number = re.findall(r'\d+', data['CodeUp'])
+
 dTag['Contents'] = fillContents(data['Sections'])
-dTag['CodeUp'] = ''
 dTag['competences'] = ', '.join(data['Competences'])
-
-dTag['q'] = '!!!!'
 
 ClassesNames = {"contact":{
       "lections":'лекции',
@@ -489,6 +496,17 @@ fillTableLections(soup, data['Sections'])
 fillTableSections(soup, data['Sections'], data['Competences'])
 fillTableLaboratory(soup, data['Sections'])
 fillTableClasses(soup, classesTypes)
+
+# список вопросов
+q = soup.find(text=re.compile('{q}'))
+item = q.parent.parent.parent
+List = item.parent
+for question in dataJSON['questions']:
+    newItem = copy.copy(item)
+    q = newItem.findChildren("text:span" , recursive=True)[0]
+    q.parent.string = q.parent.string.format(**{'q':question})
+    List.insert(-1, newItem)
+item.extract()
 
 # Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
