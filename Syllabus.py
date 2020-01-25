@@ -471,7 +471,7 @@ def fillTableClasses(soup, classesTypes):
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
-import traceback
+#import traceback
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
