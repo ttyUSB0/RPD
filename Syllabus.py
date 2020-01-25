@@ -68,11 +68,24 @@ def isHoursRight(dataJSON):
 
     total = 0
     for key in volume.keys():
+        if volume[key]!=0:
+            print('!!!\t'+key+':'+str(volume[key]))
         total += volume[key]
     if total==0:
         return True
     else:
         return False
+
+def fillContents(Sections):
+    """ Заполняем краткое содержание
+    Проходим по структуре data['Sections'] """
+    Contents = ''
+    for section in Sections:
+        Contents += section['name'] + ' ('
+        for topic in section['topics']:
+            Contents += topic['name'][0].lower() + topic['name'][1:] + ', '
+        Contents = Contents[:-2] + '); '
+    return Contents[:-2]
 
 """ ! как поставить в соответствие теги в документе и в json?
 Единообразно не получится, т.к. есть табличные данные (list для лекций) и единичные (Name, Year)
@@ -154,8 +167,60 @@ number = re.findall(r'\d+', data['CodeUp'])
 
 dTag['PartName'] = ''
 dTag['Type'] = ''
-dTag['Contents'] = ''
+dTag['Contents'] = fillContents(data['Sections'])
 dTag['CodeUp'] = ''
+dTag['competences'] = ', '.join(data['Competences'])
+
+dTag['q'] = '!!!!'
+
+ClassesNames = {"contact":{
+      "lections":'лекции',
+      "seminars":'семинары',
+      "practical":'практические занятия',
+      "workshops":'практикумы',
+      "laboratory":'лабораторные работы',
+      "colloquiums":'коллоквиумы',
+      "design":'курсовое проектирование',
+      "consultations":'групповые консультации',
+      "individual":'индивидуальная работа с преподавателем',
+      "other":'иная контактная внеаудиторная работа'},
+    "independent":{
+      "theoretical":'изучение теоретического курса',
+      "tasks":'индивидуальные задания',
+      "calculations":'расчетно-графические работы',
+      "essay":'эссе',
+      "design":'курсовое проектирование',
+      "control":'контрольные работы',
+      "other":'другие виды самостоятельной работы'}}
+
+ClassesSetContact = []
+for key in ClassesNames['contact']:
+    if dataJSON['volume']['contact'][key]>0:
+        ClassesSetContact.append(key)
+ClassesSetIndependent = []
+for key in ClassesNames['independent']:
+    if dataJSON['volume']['independent'][key]>0:
+        ClassesSetIndependent.append(key)
+
+dTag['ClassesSetContact'] = ''
+if ClassesSetContact: # если непустой список
+    if 'lections' in ClassesSetContact:
+        dTag['ClassesSetContact'] = 'занятия лекционного типа'
+    temp = ClassesSetContact[:]
+    temp.remove('lections')
+    if temp: # есть что-то кроме lections
+        dTag['ClassesSetContact'] += ', занятия семинарского типа ('
+        for key in temp:
+            dTag['ClassesSetContact'] += ClassesNames['contact'][key] + ', '
+        dTag['ClassesSetContact'] = dTag['ClassesSetContact'][:-2]
+        dTag['ClassesSetContact'] += ')'
+
+dTag['ClassesSetIndependent'] = ''
+if ClassesSetIndependent: # если непустой список
+    for key in ClassesSetIndependent:
+        dTag['ClassesSetIndependent'] += ClassesNames['independent'][key] + ', '
+    dTag['ClassesSetIndependent'] = dTag['ClassesSetIndependent'][:-2]
+
 
 # --- компетенции
 raw = GetJsonFromFile(os.path.join(folder, fileCompetences))
@@ -182,7 +247,13 @@ for item in dataClasses:
         classesTypes.append(item)
 
 
-
+def addFilledRow(table, row, dictionary):
+    """ добавление строки, с заменёнными из словаря ключами {}"""
+    newRow = copy.copy(row)
+    for item in newRow.findAll(text=re.compile('{*\w}')):
+        string = item.parent.string
+        item.parent.string = string.format(**dictionary)
+    table.insert(-1, newRow)
 
 def fillTableCompetences(soup, tableName, competences):
     """ Заполняем таблицу компетенций """
@@ -192,12 +263,48 @@ def fillTableCompetences(soup, tableName, competences):
     rows = table.findAll(name='table:table-row')
     lastRow = rows[-1]
     for key in competences:
-        newRow = copy.copy(lastRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')):
-            string = item.parent.string
-            item.parent.string = string.format(**competences[key])
-        table.insert(-1, newRow)
+        addFilledRow(table, lastRow, competences[key])
     lastRow.extract()
+
+def fillTableCompetencesControl(soup, Sections, competences, attestation):
+    """ Заполняем таблицу контроля компетенций """
+    table = soup.find(name='table:table', attrs={'table:name':'tblCompControl'})
+    if table is None:
+        raise NameError('tblCompControl not found!')
+    rows = table.findAll(name='table:table-row')
+    groupRow = rows[-2]
+    itemRow = rows[-1]
+    #
+    nSection = 1
+    comp = ', '.join(competences) # список компетенций
+    for section in Sections:
+        s = {'n':str(nSection), 'section':section['name'].upper()}
+        addFilledRow(table, groupRow, s)
+        nTopic = 1
+        for topic in section['topics']:
+            control = []
+            if 'theoretical' in topic.keys():
+                control.append('устный опрос')
+            if 'practical' in topic.keys():
+                control.append('решение задач на занятиях семинарского типа')
+            if 'laboratory' in topic.keys():
+                control.append('защита лабораторной работы')
+            control = ' ,'.join(control)
+            t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
+                 'competences':comp, 'control':control, 'controlType':'Текущий контроль'}
+            addFilledRow(table, itemRow, t)
+            nTopic += 1
+        nSection += 1
+
+    control = 'Промежуточная аттестация по дисциплине: вопросы к ' + attestation
+    t = {'n':'', 'lection':'Промежуточная аттестация',
+         'competences':comp, 'control':control,
+         'controlType':'Промежуточная аттестация по дисциплине'}
+    addFilledRow(table, itemRow, t)
+    # удаляем первые две служебные строки-заготовки
+    groupRow.extract()
+    itemRow.extract()
+
 
 def fillTableLiterature(soup, Base, Additional):
     """ Заполняем таблицу литературы """
@@ -215,11 +322,7 @@ def fillTableLiterature(soup, Base, Additional):
     for n in range(len(Base)):
         book = copy.copy(Base[n])
         book['n'] = str(n+1)
-        newRow = copy.copy(itemRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')):
-            string = item.parent.string
-            item.parent.string = string.format(**book)
-        table.insert(-1, newRow)
+        addFilledRow(table, itemRow, book)
     # Дополнительная литература
     newRow = copy.copy(groupRow)
     item = newRow.find(text=re.compile('{*\w}'))
@@ -228,11 +331,7 @@ def fillTableLiterature(soup, Base, Additional):
     for n in range(len(Additional)):
         book = copy.copy(Additional[n])
         book['n'] = str(n+1)
-        newRow = copy.copy(itemRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')):
-            string = item.parent.string
-            item.parent.string = string.format(**book)
-        table.insert(-1, newRow)
+        addFilledRow(table, itemRow, book)
     # удаляем первые две служебные строки-заготовки
     groupRow.extract()
     itemRow.extract()
@@ -250,21 +349,12 @@ def fillTableLections(soup, Sections):
     nSection = 1
     for section in Sections:
         s = {'n':str(nSection), 'section':section['name'].upper()}
-        newRow = copy.copy(groupRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')): #
-            string = item.parent.string
-            item.parent.string = string.format(**s)
-        table.insert(-1, newRow)
-
+        addFilledRow(table, groupRow, s)
         nTopic = 1
         for topic in section['topics']:
-            newRow = copy.copy(itemRow)
             t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
                  'content':topic['content']}
-            for item in newRow.findAll(text=re.compile('{*\w}')): #
-                string = item.parent.string
-                item.parent.string = string.format(**t)
-            table.insert(-1, newRow)
+            addFilledRow(table, itemRow, t)
             nTopic += 1
         nSection += 1
     # удаляем первые две служебные строки-заготовки
@@ -289,15 +379,10 @@ def fillTableSections(soup, Sections, competences):
     for section in Sections:
         s = {'n':str(nSection), 'section':section['name'].upper(),
                  'competences': ', '.join(competences)}
-        newRow = copy.copy(groupRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')): #
-            string = item.parent.string
-            item.parent.string = string.format(**s)
-        table.insert(-1, newRow)
+        addFilledRow(table, groupRow, s)
 
         nTopic = 1
         for topic in section['topics']:
-            newRow = copy.copy(itemRow)
             vLection = topic['hours']
             vSeminar = 0
             if 'seminar' in topic.keys():
@@ -324,27 +409,16 @@ def fillTableSections(soup, Sections, competences):
             t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
                  'vLection':str(vLection), 'vSeminar':str(vSeminar),
                  'vLaboratory':str(vLaboratory), 'vIndependent':str(vIndependent)}
-            for item in newRow.findAll(text=re.compile('{*\w}')): #
-                string = item.parent.string
-                item.parent.string = string.format(**t)
-            table.insert(-1, newRow)
+            addFilledRow(table, itemRow, t)
             nTopic += 1
         nSection += 1
 
     t = {'n':'', 'lection':'Итого в семестр:',
      'vLection':str(nLection), 'vSeminar':str(nSeminar),
      'vLaboratory':str(nLaboratory), 'vIndependent':str(nIndependent)}
-    newRow = copy.copy(itemRow)
-    for item in newRow.findAll(text=re.compile('{*\w}')): #
-        string = item.parent.string
-        item.parent.string = string.format(**t)
-    table.insert(-1, newRow)
+    addFilledRow(table, itemRow, t)
     t['lection'] = 'Всего:'
-    newRow = copy.copy(itemRow)
-    for item in newRow.findAll(text=re.compile('{*\w}')): #
-        string = item.parent.string
-        item.parent.string = string.format(**t)
-    table.insert(-1, newRow)
+    addFilledRow(table, itemRow, t)
     # удаляем первые две служебные строки-заготовки
     groupRow.extract()
     itemRow.extract()
@@ -367,23 +441,14 @@ def fillTableLaboratory(soup, Sections):
                 isLabExist = True
         if isLabExist: # в этой секции есть лабы
             s = {'n':str(nSection), 'section':section['name'].upper()}
-            newRow = copy.copy(groupRow)
-            for item in newRow.findAll(text=re.compile('{*\w}')): #
-                string = item.parent.string
-                item.parent.string = string.format(**s)
-            table.insert(-1, newRow)
-
+            addFilledRow(table, groupRow, s)
             nTopic = 1
             for topic in section['topics']:
                 if 'laboratory' in topic.keys():
                     for lab in topic['laboratory']:
-                        newRow = copy.copy(itemRow)
                         t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
                          'laboratory':lab['name'], 'content':lab['content']}
-                        for item in newRow.findAll(text=re.compile('{*\w}')): #
-                            string = item.parent.string
-                            item.parent.string = string.format(**t)
-                        table.insert(-1, newRow)
+                        addFilledRow(table, itemRow, t)
                 nTopic += 1
         nSection += 1
     # удаляем первые две служебные строки-заготовки
@@ -400,16 +465,13 @@ def fillTableClasses(soup, classesTypes):
     lastRow = rows[-1]
     for item in classesTypes:
         t = {'type':item['name'], 'text':item['text']}
-        newRow = copy.copy(lastRow)
-        for item in newRow.findAll(text=re.compile('{*\w}')):
-            string = item.parent.string
-            item.parent.string = string.format(**t)
-        table.insert(-1, newRow)
+        addFilledRow(table, lastRow, t)
     lastRow.extract()
 
 
 # --------------------------------------- РАБОТА С ШАБЛОНОМ
 # -------- Читаем шаблон fodt, заменяем теги
+import traceback
 fileIn = 'layout.fodt'
 fileOut = 'syllabus.fodt'
 
@@ -419,6 +481,8 @@ with open(os.path.join(folder, fileIn), "r") as file:
 # таблицы
 fillTableCompetences(soup, 'tblCompAnn', competences)
 fillTableCompetences(soup, 'tblCompMain', competences)
+fillTableCompetences(soup, 'tblCompFOS', competences)
+fillTableCompetencesControl(soup, data['Sections'], data['Competences'], data['VolumeAttestation'])
 
 fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
 fillTableLections(soup, data['Sections'])
@@ -429,11 +493,17 @@ fillTableClasses(soup, classesTypes)
 # Заменяем теги значениями из словаря dTag
 for item in soup.findAll(text=re.compile('{*\w}')):
     string = item.parent.string
-    item.parent.string = string.format(**dTag)
+    if not string is None:
+        item.parent.string = string.format(**dTag)
+    else:
+        item.string = item.string.format(**dTag)
+
+#    try:
+#    except Exception:
+#        print(string)
+#        print(traceback.format_exception())
 
 with open(os.path.join(folder, fileOut), "w") as file:
     file.write(str(soup))
-
-
 
 
