@@ -16,10 +16,13 @@ import copy
 import re
 
 folder='/home/alex/Учебная работа/РПД/БД/'
+fileCompetences = 'ЭККА компетенции.json'
+fileJSON = 'НЭ ЭК КА.json'
+
 
 def GetJsonFromFile(filePath):
     """ исключает комментарии
-    //
+    ///
     /* */
     https://stackoverflow.com/a/57814048/5355749
     """
@@ -64,9 +67,11 @@ def isHoursRight(dataJSON):
             if 'laboratory' in topic.keys():
                 for lab in topic['laboratory']:
                     volume['laboratory'] -=  lab['hours']
+            if 'practical' in topic.keys():
+                for pract in topic['practical']:
+                    volume['practical'] -=  pract['hours']
             if 'theoretical' in topic.keys():
                 volume['theoretical'] -=  topic['theoretical']
-
     total = 0
     for key in volume.keys():
         if volume[key]!=0:
@@ -95,8 +100,6 @@ def fillContents(Sections):
 """
 
 # -------- Читаем JSONы
-fileCompetences = 'ЭККА компетенции.json'
-fileJSON = 'НЭ ЭК КА.json'
 fileClassesType = 'Виды занятий.json'
 
 raw = GetJsonFromFile(os.path.join(folder, fileJSON))
@@ -105,6 +108,8 @@ if not isHoursRight(dataJSON):
     raise ValueError('Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
 
 data = iterData(dataJSON)
+
+
 dTag = {} # Здесь будут только единичные данные (не списки)
 for (key, value) in data.items():
     if not(type(value) is list):
@@ -392,8 +397,8 @@ def fillTableSections(soup, Sections, competences):
         for topic in section['topics']:
             vLection = topic['hours']
             vSeminar = 0
-            if 'seminar' in topic.keys():
-                for item in topic['seminar']:
+            if 'practical' in topic.keys():
+                for item in topic['practical']:
                     vSeminar += item['hours']
             vLaboratory = 0
             if 'laboratory' in topic.keys():
@@ -430,34 +435,34 @@ def fillTableSections(soup, Sections, competences):
     groupRow.extract()
     itemRow.extract()
 
-def fillTableLaboratory(soup, Sections):
-    """ Заполняем таблицу tblLaboratory """
-    table = soup.find(name='table:table', attrs={'table:name':'tblLaboratory'})
+
+def fillTableSeminar(soup, Sections, tableName, seminarType):
+    """ Заполняем таблицу tableName = tblLaboratory/tblPractical
+    seminarType = laboratory / practical
+    """
+    table = soup.find(name='table:table', attrs={'table:name':tableName})
     if table is None:
-        raise NameError('tblLaboratory not found!')
+        raise NameError(tableName + ' not found!')
     rows = table.findAll(name='table:table-row')
     groupRow = rows[-2]
     itemRow = rows[-1]
-    #
-    nSection = 1
+    nSection = 0 # номер порядковый в списке секций
+    iSection = 0 # номер порядковый в таблице
     for section in Sections:
-        # Проверяем, есть ли лабораторки в темах
-        isLabExist = False
-        for topic in section['topics']:
-            if 'laboratory' in topic.keys():
-                isLabExist = True
-        if isLabExist: # в этой секции есть лабы
-            s = {'n':str(nSection), 'section':section['name'].upper()}
-            addFilledRow(table, groupRow, s)
-            nTopic = 1
-            for topic in section['topics']:
-                if 'laboratory' in topic.keys():
-                    for lab in topic['laboratory']:
-                        t = {'n':str(nSection)+'.'+str(nTopic), 'lection':topic['name'],
-                         'laboratory':lab['name'], 'content':lab['content']}
-                        addFilledRow(table, itemRow, t)
-                nTopic += 1
         nSection += 1
+        if any(seminarType in topic.keys() for topic in section['topics']): # Проверяем, есть ли лабораторки в темах
+            iSection += 1
+            s = {'n':str(iSection),
+                 'section':'Раздел %d. %s'%(nSection, section['name'].upper())}
+            addFilledRow(table, groupRow, s)
+            i = 0 # номер порядковый в таблице
+            for topic in section['topics']: # пробегаем по топикам
+                if seminarType in topic.keys():
+                    for seminar in topic[seminarType]:
+                        i += 1
+                        t = {'n':str(iSection)+'.'+str(i), 'lection':topic['name'],
+                         'seminar':seminar['name'], 'content':seminar['content']}
+                        addFilledRow(table, itemRow, t)
     # удаляем первые две служебные строки-заготовки
     groupRow.extract()
     itemRow.extract()
@@ -480,7 +485,8 @@ def fillTableClasses(soup, classesTypes):
 # -------- Читаем шаблон fodt, заменяем теги
 #import traceback
 fileIn = 'layout.fodt'
-fileOut = 'syllabus.fodt'
+# fileOut = 'syllabus.fodt'
+fileOut = dTag['ProgramCode']+'_'+fileCompetences.split(' ')[0]+' - '+fileJSON.split('.')[0]+ '.fodt'
 
 with open(os.path.join(folder, fileIn), "r") as file:
     soup = BeautifulSoup(file.read(), features="xml")
@@ -494,17 +500,19 @@ fillTableCompetencesControl(soup, data['Sections'], data['Competences'], data['V
 fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
 fillTableLections(soup, data['Sections'])
 fillTableSections(soup, data['Sections'], data['Competences'])
-fillTableLaboratory(soup, data['Sections'])
+fillTableSeminar(soup, data['Sections'], 'tblLaboratory', 'laboratory')
+fillTableSeminar(soup, data['Sections'], 'tblPractical', 'practical')
+
 fillTableClasses(soup, classesTypes)
 
 # список вопросов
 q = soup.find(text=re.compile('{q}'))
-item = q.parent.parent.parent
+item = q.parent.parent
 List = item.parent
 for question in dataJSON['questions']:
     newItem = copy.copy(item)
-    q = newItem.findChildren("text:span" , recursive=True)[0]
-    q.parent.string = q.parent.string.format(**{'q':question})
+    q = newItem.findChildren("text:p" , recursive=True)[0]
+    q.string = q.string.format(**{'q':question})
     List.insert(-1, newItem)
 item.extract()
 
@@ -525,3 +533,4 @@ with open(os.path.join(folder, fileOut), "w") as file:
     file.write(str(soup))
 
 
+Sections = data['Sections']
