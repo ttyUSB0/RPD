@@ -14,10 +14,13 @@ import json
 from bs4 import BeautifulSoup
 import copy
 import re
+from collections import defaultdict
+
 
 folder='/home/alex/Учебная работа/РПД/БД/'
-fileJSON = 'НЭ ЭК КА.json'
-#fileJSON = 'ТОП СУ РКТ.json'
+#fileJSON = 'ЭЭТК КА 2019.json'
+#fileJSON = 'НЭ ЭК КА 2016.json'
+fileJSON = 'ТОП ЭА РКТ 2019.json'
 
 
 def GetJsonFromFile(filePath):
@@ -184,7 +187,6 @@ if CodeUp[0].startswith('Б'):
         if len(CodeUp) > 2: #    Б1.В.ДВ
             dTag['PartName'] += ' и относится к дисциплинам по выбору студента'
 
-#import re
 #code = re.findall(r'[А-Я]+', data['CodeUp'])
 #number = re.findall(r'\d+', data['CodeUp'])
 
@@ -631,8 +633,6 @@ def fillTableRating(soup, Seminars):
     itemRow.extract()
 
 # делим уч. план на занятия: Считаем
-from collections import defaultdict
-
 Seminars = []
 hoursList = defaultdict(int)
 for section in data['Sections']:
@@ -650,7 +650,7 @@ for section in data['Sections']:
                 Seminars.append({'type':'Практическое занятие (%dч)'%(work['hours'],),
                          'content':work['content'], 'control':'Выполнение и сдача задания'})
                 hoursList['practical'] += work['hours']
-if len(Seminars)%18 > 0:
+if len(Seminars)%9 > 0:
         raise ValueError('! Колво занятий не соответствует колву недель')
 
 
@@ -673,7 +673,8 @@ dTag['Group'] = ''
 
 fileIn = 'layRating.fodt'
 # fileOut = 'syllabus.fodt'
-fileOut = (dTag['ProgramCode'] + '_' + dataJSON['competences']['file'].split(' ')[0]+
+fileOut = (dTag['ProgramCode'] + '_' +
+    dataJSON['competences']['file'].split(' ')[0]+
     ' - ' + fileJSON.split('.')[0] + ' - Рейтинг-план.fodt')
 
 with open(os.path.join(folder, fileIn), "r") as file:
