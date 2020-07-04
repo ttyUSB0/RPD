@@ -19,12 +19,14 @@ from collections import defaultdict
 
 folder='/home/alex/Учебная работа/РПД/БД/'
 #fileJSON = 'ЭЭТК КА 2019.json'
-#fileJSON = 'НЭ ЭК КА 2016.json'
-fileJSON = 'ТОП ЭА РКТ 2019.json'
+fileJSON = 'КТОРИИиЭСУ СУ ЛА 2019.json'
+fileJSON = 'НЭ ЭК КА 2019.json'
+#fileJSON = 'ЭиЭ РКК 2016.json'
+#fileJSON = 'ТОП ЭА РКТ 2019.json'
 
 
 def GetJsonFromFile(filePath):
-    """ исключает комментарии
+    """ исключает комментарии вида
     ///
     /* */
     https://stackoverflow.com/a/57814048/5355749
@@ -63,6 +65,7 @@ def isHoursRight(dataJSON):
     Проходим по структуре data['Sections'], суммируем часы в счетчики, сверяем с VolumeContact* """
     volume = copy.copy(dataJSON['volume']['contact'])
     volume['theoretical'] = dataJSON['volume']['independent']['theoretical']
+    volume['other'] = 0 # Экзамен не учитываем
 
     for section in dataJSON['sections']:
         for topic in section['topics']:
@@ -112,6 +115,8 @@ with open(os.path.join(folder, 'test.json'), "w") as file:
 dataJSON = json.loads(raw)
 if not isHoursRight(dataJSON):
     raise ValueError('Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
+else:
+    print("С часами всё ОК.")
 
 
 data = iterData(dataJSON)
