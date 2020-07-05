@@ -5,26 +5,45 @@ Created on Mon Oct  7 18:32:23 2019
 @author: alex
 
 Код для формирования РПД и рейтинг-плана по БД в JSON.
-
 Заполняем файл-основу (LibreOffice *.fodt)
+Работа с таблицами:
+ Ищем таблицу по имени
+ берём последнюю строку, вырезаем её
+ вставляем её, заменяя теги.
+
+
+Вызов из терминала, первый параметр - имя json-файла с данными дисциплины
 """
 
 import os
 import json
+from json.decoder import JSONDecodeError
 from bs4 import BeautifulSoup
 import copy
 import re
 from collections import defaultdict
+import sys
 
-
-folder='/home/alex/Учебная работа/РПД/БД/'
-#fileJSON = 'ЭЭТК КА 2019.json'
-fileJSON = 'КТОРИИиЭСУ СУ ЛА 2019.json'
-fileJSON = 'НЭ ЭК КА 2019.json'
-#fileJSON = 'ЭиЭ РКК 2016.json'
-#fileJSON = 'ТОП ЭА РКТ 2019.json'
-
-
+ClassesNames = {"contact":{
+      "lections":'лекции',
+      "seminars":'семинары',
+      "practical":'практические занятия',
+      "workshops":'практикумы',
+      "laboratory":'лабораторные работы',
+      "colloquiums":'коллоквиумы',
+      "design":'курсовое проектирование',
+      "consultations":'групповые консультации',
+      "individual":'индивидуальная работа с преподавателем',
+      "other":'иная контактная внеаудиторная работа'},
+    "independent":{
+      "theoretical":'изучение теоретического курса',
+      "tasks":'индивидуальные задания',
+      "calculations":'расчетно-графические работы',
+      "essay":'эссе',
+      "design":'курсовое проектирование',
+      "control":'контрольные работы',
+      "other":'другие виды самостоятельной работы'}}
+# -------------------------- Функции общие ()
 def GetJsonFromFile(filePath):
     """ исключает комментарии вида
     ///
@@ -99,179 +118,117 @@ def fillContents(Sections):
         Contents = Contents[:-2] + '); '
     return Contents[:-2]
 
-""" Работа с таблицами:
- Ищем таблицу по имени
- берём последнюю строку, вырезаем её
- вставляем её, заменяя теги.
-"""
+def FillTags(data):
+    """ Создаём словарь с ключами, которые соответствуют ключам в fodt
+    Это новый словарь, дополненный. Ключи со сложными значениями, вычисляемые """
+    dTag = {} # Здесь будут только единичные данные (не списки)
+    for (key, value) in data.items():
+        if not(type(value) is list):
+            dTag.update({key: value})
 
-# -------- Читаем JSONы
-fileClassesType = 'Виды занятий.json'
+    # Расчеты часов, к заполнению в поля
+    dTag['VolumeContactSeminarsTotal'] = (dTag['VolumeContactSeminars']+
+        dTag['VolumeContactPractical']+
+        dTag['VolumeContactWorkshops']+
+        dTag['VolumeContactLaboratory']+
+        dTag['VolumeContactColloquiums'])
+    dTag['VolumeContactAnother'] = (dTag['VolumeContactDesign']+
+        dTag['VolumeContactConsultations']+
+        dTag['VolumeContactIndividual'])
 
-raw = GetJsonFromFile(os.path.join(folder, fileJSON))
-with open(os.path.join(folder, 'test.json'), "w") as file:
-    file.write(raw)
+    dTag['VolumeContactTotal'] = (dTag['VolumeContactLections']+
+        dTag['VolumeContactSeminarsTotal']+
+        dTag['VolumeContactAnother']+
+        dTag['VolumeContactOther'])
 
-dataJSON = json.loads(raw)
-if not isHoursRight(dataJSON):
-    raise ValueError('Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
-else:
-    print("С часами всё ОК.")
+    dTag['VolumeIndependentTotal'] = (dTag['VolumeIndependentTheoretical']+
+        dTag['VolumeIndependentTasks']+
+        dTag['VolumeIndependentCalculations']+
+        dTag['VolumeIndependentEssay']+
+        dTag['VolumeIndependentDesign']+
+        dTag['VolumeIndependentControl']+
+        dTag['VolumeIndependentOther'])
 
+    dTag['VolumeHoursTotal'] = (dTag['VolumeContactTotal']+
+        dTag['VolumeIndependentTotal'])
+    dTag['VolumePointsTotal'] = int(dTag['VolumeHoursTotal']/36)
 
-data = iterData(dataJSON)
-# TODO: Убрать структуру data совсем, только dTag либо сырые
+    dTag['Percent'] = str(int(100*dTag['VolumeIndependentTheoretical']/dTag['VolumeHoursTotal']))
 
-dTag = {} # Здесь будут только единичные данные (не списки)
-for (key, value) in data.items():
-    if not(type(value) is list):
-        dTag.update({key: value})
+    for key in dTag.keys():
+        if key.startswith('VolumeContact') or key.startswith('VolumeIndependent'):
+            if dTag[key] == 0: # Заменяем нули на минусы
+                dTag[key] = '-'
+            else:
+                dTag[key] = '%.1f(%d)'%(dTag[key]/36, dTag[key])
 
-# Расчеты часов, к заполнению в поля
-dTag['VolumeContactSeminarsTotal'] = (dTag['VolumeContactSeminars']+
-    dTag['VolumeContactPractical']+
-    dTag['VolumeContactWorkshops']+
-    dTag['VolumeContactLaboratory']+
-    dTag['VolumeContactColloquiums'])
-dTag['VolumeContactAnother'] = (dTag['VolumeContactDesign']+
-    dTag['VolumeContactConsultations']+
-    dTag['VolumeContactIndividual'])
+    # Списки
+    dTag['ConnectsWithList']=''
+    for item in data['ConnectsWith']:
+        dTag['ConnectsWithList']=dTag['ConnectsWithList']+'«'+item+'», '
+    dTag['ConnectsWithList'] = dTag['ConnectsWithList'][:-2] + '.'
 
-dTag['VolumeContactTotal'] = (dTag['VolumeContactLections']+
-    dTag['VolumeContactSeminarsTotal']+
-    dTag['VolumeContactAnother']+
-    dTag['VolumeContactOther'])
+    dTag['NecessaryForList']=''
+    for item in data['NecessaryFor']:
+        dTag['NecessaryForList']=dTag['NecessaryForList']+'«'+item+'», '
+    dTag['NecessaryForList'] = dTag['NecessaryForList'][:-2] + ' и др.'
 
-dTag['VolumeIndependentTotal'] = (dTag['VolumeIndependentTheoretical']+
-    dTag['VolumeIndependentTasks']+
-    dTag['VolumeIndependentCalculations']+
-    dTag['VolumeIndependentEssay']+
-    dTag['VolumeIndependentDesign']+
-    dTag['VolumeIndependentControl']+
-    dTag['VolumeIndependentOther'])
-
-dTag['VolumeHoursTotal'] = (dTag['VolumeContactTotal']+
-    dTag['VolumeIndependentTotal'])
-dTag['VolumePointsTotal'] = int(dTag['VolumeHoursTotal']/36)
-
-dTag['Percent'] = str(int(100*dTag['VolumeIndependentTheoretical']/dTag['VolumeHoursTotal']))
-
-for key in dTag.keys():
-    if key.startswith('VolumeContact') or key.startswith('VolumeIndependent'):
-        if dTag[key] == 0: # Заменяем нули на минусы
-            dTag[key] = '-'
-        else:
-            dTag[key] = '%.1f(%d)'%(dTag[key]/36, dTag[key])
-
-# Списки
-dTag['ConnectsWithList']=''
-for item in data['ConnectsWith']:
-    dTag['ConnectsWithList']=dTag['ConnectsWithList']+'«'+item+'», '
-dTag['ConnectsWithList'] = dTag['ConnectsWithList'][:-2] + '.'
-
-dTag['NecessaryForList']=''
-for item in data['NecessaryFor']:
-    dTag['NecessaryForList']=dTag['NecessaryForList']+'«'+item+'», '
-dTag['NecessaryForList'] = dTag['NecessaryForList'][:-2] + ' и др.'
-
-dTag['Tasks']=''
-for item in data['Tasks']:
-    dTag['Tasks']=dTag['Tasks']+' '+item+'; '
-dTag['Tasks'] = dTag['Tasks'][:-2] + '.'
+    dTag['Tasks']=''
+    for item in data['Tasks']:
+        dTag['Tasks']=dTag['Tasks']+' '+item+'; '
+    dTag['Tasks'] = dTag['Tasks'][:-2] + '.'
 
 
-dTag['CodeUp'] = data['CodeUp']
-dTag['PartName'] = 'входит в '
-CodeUp = data['CodeUp'].split('.')
+    dTag['CodeUp'] = data['CodeUp']
+    dTag['PartName'] = 'входит в '
+    CodeUp = data['CodeUp'].split('.')
 
-if CodeUp[0].startswith('Б'):
-    if CodeUp[1].startswith('Б'):
-        dTag['PartName'] += 'обязательную часть блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
-    elif CodeUp[1].startswith('В') :
-        dTag['PartName'] += 'часть, формируемую участниками образовательных отношений блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
-        if len(CodeUp) > 2: #    Б1.В.ДВ
-            dTag['PartName'] += ' и относится к дисциплинам по выбору студента'
+    if CodeUp[0].startswith('Б'):
+        if CodeUp[1].startswith('Б'):
+            dTag['PartName'] += 'обязательную часть блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
+        elif CodeUp[1].startswith('В') :
+            dTag['PartName'] += 'часть, формируемую участниками образовательных отношений блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
+            if len(CodeUp) > 2: #    Б1.В.ДВ
+                dTag['PartName'] += ' и относится к дисциплинам по выбору студента'
 
-#code = re.findall(r'[А-Я]+', data['CodeUp'])
-#number = re.findall(r'\d+', data['CodeUp'])
+    #code = re.findall(r'[А-Я]+', data['CodeUp'])
+    #number = re.findall(r'\d+', data['CodeUp'])
 
-dTag['Contents'] = fillContents(data['Sections'])
-dTag['competences'] = ', '.join(dataJSON['competences']['items'])
+    dTag['Contents'] = fillContents(data['Sections'])
+    dTag['competences'] = ', '.join(dataJSON['competences']['items'])
 
-ClassesNames = {"contact":{
-      "lections":'лекции',
-      "seminars":'семинары',
-      "practical":'практические занятия',
-      "workshops":'практикумы',
-      "laboratory":'лабораторные работы',
-      "colloquiums":'коллоквиумы',
-      "design":'курсовое проектирование',
-      "consultations":'групповые консультации',
-      "individual":'индивидуальная работа с преподавателем',
-      "other":'иная контактная внеаудиторная работа'},
-    "independent":{
-      "theoretical":'изучение теоретического курса',
-      "tasks":'индивидуальные задания',
-      "calculations":'расчетно-графические работы',
-      "essay":'эссе',
-      "design":'курсовое проектирование',
-      "control":'контрольные работы',
-      "other":'другие виды самостоятельной работы'}}
+    ClassesSetContact = []
+    for key in ClassesNames['contact']:
+        if dataJSON['volume']['contact'][key]>0:
+            ClassesSetContact.append(key)
+    ClassesSetIndependent = []
+    for key in ClassesNames['independent']:
+        if dataJSON['volume']['independent'][key]>0:
+            ClassesSetIndependent.append(key)
 
-ClassesSetContact = []
-for key in ClassesNames['contact']:
-    if dataJSON['volume']['contact'][key]>0:
-        ClassesSetContact.append(key)
-ClassesSetIndependent = []
-for key in ClassesNames['independent']:
-    if dataJSON['volume']['independent'][key]>0:
-        ClassesSetIndependent.append(key)
+    dTag['ClassesSetContact'] = ''
+    if ClassesSetContact: # если непустой список
+        if 'lections' in ClassesSetContact:
+            dTag['ClassesSetContact'] = 'занятия лекционного типа'
+        temp = ClassesSetContact[:]
+        temp.remove('lections')
+        if temp: # есть что-то кроме lections
+            dTag['ClassesSetContact'] += ', занятия семинарского типа ('
+            for key in temp:
+                dTag['ClassesSetContact'] += ClassesNames['contact'][key] + ', '
+            dTag['ClassesSetContact'] = dTag['ClassesSetContact'][:-2]
+            dTag['ClassesSetContact'] += ')'
 
-dTag['ClassesSetContact'] = ''
-if ClassesSetContact: # если непустой список
-    if 'lections' in ClassesSetContact:
-        dTag['ClassesSetContact'] = 'занятия лекционного типа'
-    temp = ClassesSetContact[:]
-    temp.remove('lections')
-    if temp: # есть что-то кроме lections
-        dTag['ClassesSetContact'] += ', занятия семинарского типа ('
-        for key in temp:
-            dTag['ClassesSetContact'] += ClassesNames['contact'][key] + ', '
-        dTag['ClassesSetContact'] = dTag['ClassesSetContact'][:-2]
-        dTag['ClassesSetContact'] += ')'
+    dTag['ClassesSetIndependent'] = ''
+    if ClassesSetIndependent: # если непустой список
+        for key in ClassesSetIndependent:
+            dTag['ClassesSetIndependent'] += ClassesNames['independent'][key] + ', '
+        dTag['ClassesSetIndependent'] = dTag['ClassesSetIndependent'][:-2]
 
-dTag['ClassesSetIndependent'] = ''
-if ClassesSetIndependent: # если непустой список
-    for key in ClassesSetIndependent:
-        dTag['ClassesSetIndependent'] += ClassesNames['independent'][key] + ', '
-    dTag['ClassesSetIndependent'] = dTag['ClassesSetIndependent'][:-2]
+    return (dTag, ClassesSetContact, ClassesSetIndependent)
 
 
-# --- компетенции
-raw = GetJsonFromFile(os.path.join(folder, dataJSON['competences']['file']))
-dataComp = json.loads(raw)
-competences = {}
-for key in dataJSON['competences']['items']:
-    competences[key] = dataComp[key]
-
-raw = GetJsonFromFile(os.path.join(folder, fileClassesType))
-dataClasses = json.loads(raw)
-classes = []
-# contact
-for item in ('lections', 'laboratory', 'practical'):
-    if dataJSON['volume']['contact'][item]>0:
-        classes.append(item)
-# independent
-for item in ('theoretical', 'design', 'tasks', 'other'):
-    if dataJSON['volume']['independent'][item]>0:
-        classes.append(item)
-
-classesTypes = []
-for item in dataClasses:
-    if item['type'] in classes:
-        classesTypes.append(item)
-
-
+# ------------------------------ Функции работы с xml (fodt)
 def addFilledRow(table, row, dictionary):
     """ добавление строки, с заменёнными из словаря ключами {}"""
     newRow = copy.copy(row)
@@ -530,91 +487,6 @@ def fillList(soup, listTag, listContent):
         q.string = q.string.format(**{listTag:question})
         List.insert(-1, newItem)
     item.extract()
-# --------------------------------------- РАБОТА С ШАБЛОНОМ
-# -------- Читаем шаблон fodt, заменяем теги
-fileIn = 'layout.fodt'
-# fileOut = 'syllabus.fodt'
-fileOut = (dTag['ProgramCode'] + '_' + dataJSON['competences']['file'].split(' ')[0]+
-    ' - ' + fileJSON.split('.')[0] + '.fodt')
-
-with open(os.path.join(folder, fileIn), "r") as file:
-    soup = BeautifulSoup(file.read(), features="xml")
-
-# таблицы
-fillTableCompetences(soup, 'tblCompAnn', competences)
-fillTableCompetences(soup, 'tblCompMain', competences)
-fillTableCompetences(soup, 'tblCompFOS', competences)
-fillTableCompetencesControl(soup, data['Sections'], dataJSON['competences']['items'], data['VolumeAttestation'])
-
-fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
-fillTableLections(soup, data['Sections'])
-fillTableSections(soup, data['Sections'], dataJSON['competences']['items'])
-fillTableSeminar(soup, data['Sections'], 'tblLaboratory', 'laboratory')
-fillTableSeminar(soup, data['Sections'], 'tblPractical', 'practical')
-
-fillTableClasses(soup, classesTypes)
-fillList(soup, 'tasks', dataJSON['tasks']) # список задач, их два , вызывает два раза
-fillList(soup, 'tasks', dataJSON['tasks'])
-fillList(soup, 'q', dataJSON['questions']) # список вопросов
-
-# Заменяем теги значениями из словаря dTag
-for item in soup.findAll(text=re.compile('{*\w}')):
-    string = item.parent.string
-    if not string is None:
-        item.parent.string = string.format(**dTag)
-    else:
-        item.string = item.string.format(**dTag)
-
-with open(os.path.join(folder, fileOut), "w") as file:
-    file.write(str(soup))
-
-
-# -------- CPC
-dTag['Seminar'] = ''
-if 'laboratory' in ClassesSetContact:
-    dTag['Seminar'] += """ Для успешного выполнения и защиты лабораторной работы
-    предварительно необходимо изучить теоретический материал по соответствующей теме,
-    методические указания, подготовить отчет по установленной форме [7]. После проведения
-    исследований и окончательного оформления отчета проводится защита лабораторной работы.
-    """
-if 'practical' in ClassesSetContact:
-    dTag['Seminar'] += """ Самостоятельная работа студентов на практических занятиях
-    может предусматривать выполнение контрольных работ; решение задач; работу со
-    справочной, нормативной документацией и научной литературой; защиту выполненных
-    работ; тестирование и т.д. Контроль работы студентов на практических занятиях
-    осуществляет преподаватель в соответствии с требованиями рабочей программы
-    дисциплины.
-    """
-
-fileIn = 'layCPC.fodt'
-# fileOut = 'syllabus.fodt'
-fileOut = (dTag['ProgramCode'] + '_' + dataJSON['competences']['file'].split(' ')[0]+
-    ' - ' + fileJSON.split('.')[0] + ' - МУ по СРС.fodt')
-
-with open(os.path.join(folder, fileIn), "r") as file:
-    soup = BeautifulSoup(file.read(), features="xml")
-
-# таблицы
-fillTableClasses(soup, classesTypes)
-fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
-fillTableCPC(soup, data['Sections'])
-
-fillList(soup, 'tasks', dataJSON['tasks']) # список задач
-
-# Заменяем теги значениями из словаря dTag
-for item in soup.findAll(text=re.compile('{*\w}')):
-    string = item.parent.string
-    if not string is None:
-        item.parent.string = string.format(**dTag)
-    else:
-        item.string = item.string.format(**dTag)
-
-with open(os.path.join(folder, fileOut), "w") as file:
-    file.write(str(soup))
-# Sections = data['Sections']
-
-# -------- Rating
-
 
 def fillTableRating(soup, Seminars):
     """ Заполняем таблицу рейтинг-плана """
@@ -637,74 +509,213 @@ def fillTableRating(soup, Seminars):
             week += 1
     itemRow.extract()
 
-# делим уч. план на занятия: Считаем
-Seminars = []
-hoursList = defaultdict(int)
-for section in data['Sections']:
-    for topic in section['topics']: # пробегаем по топикам
-        Seminars.append({'type':'Лекция (%dч)'%(topic['hours'],),
-                         'content':topic['content'], 'control':'Опрос'})
-        hoursList['lections'] += topic['hours']
-        if 'laboratory' in topic.keys():
-            for work in topic['laboratory']:
-                Seminars.append({'type':'Лабораторная работа (%dч)'%(work['hours'],),
-                         'content':work['content'], 'control':'Выполнение и защита отчета'})
-                hoursList['laboratory'] += work['hours']
-        if 'practical' in topic.keys():
-            for work in topic['practical']:
-                Seminars.append({'type':'Практическое занятие (%dч)'%(work['hours'],),
-                         'content':work['content'], 'control':'Выполнение и сдача задания'})
-                hoursList['practical'] += work['hours']
-if len(Seminars)%9 > 0:
-        raise ValueError('! Колво занятий не соответствует колву недель')
 
+# ------------------------------ Главный код
+if __name__ == "__main__":
+    if len(sys.argv)!=2:
+        print('Скрипт принимает единственный параметр - имя json-файла с данными дисциплины\npython3 Syllabus.py "СУ ИИ 2019.json"')
+        sys.exit()
 
-hours = []
-for (key,value) in hoursList.items():
-    hours.append('%d\t-%s'%(value, ClassesNames["contact"][key]))
+    folder = os.getcwd()
+    fileJSON = sys.argv[1]
 
-mark = []
-if 'lections' in hoursList.keys():
-    mark.append({'type':'Опрос', 'points':str(int(25/6/(len(Seminars)//18)))})
-if 'laboratory' in hoursList.keys():
-    mark.append({'type':'Выполнение и защита отчета', 'points':str(int(25/6/(len(Seminars)//18)))})
-if 'practical' in hoursList.keys():
-    mark.append({'type':'Выполнение и защита задания', 'points':str(int(25/6/(len(Seminars)//18)))})
-if dataJSON['volume']['attestation'].startswith('зач'):
-    mark.append({'type':dataJSON['volume']['attestation'], 'points':'25'})
+    # -------- Читаем JSONы
+    raw = GetJsonFromFile(os.path.join(folder, fileJSON))
+    try:
+        dataJSON = json.loads(raw)
+    except JSONDecodeError:
+        print ('Проверьте json-файл на корректность (www.jsonlint.com)')
+        sys.exit()
 
-
-dTag['Group'] = ''
-
-fileIn = 'layRating.fodt'
-# fileOut = 'syllabus.fodt'
-fileOut = (dTag['ProgramCode'] + '_' +
-    dataJSON['competences']['file'].split(' ')[0]+
-    ' - ' + fileJSON.split('.')[0] + ' - Рейтинг-план.fodt')
-
-with open(os.path.join(folder, fileIn), "r") as file:
-    soup = BeautifulSoup(file.read(), features="xml")
-
-# таблицы
-fillTableRating(soup, Seminars)
-# tblControlType
-table = soup.find(name='table:table', attrs={'table:name':'tblControlType'})
-rows = table.findAll(name='table:table-row')
-itemRow = rows[-1]
-for m in mark:
-    addFilledRow(table, itemRow, m)
-itemRow.extract()
-
-
-fillList(soup, 'Hours', hours) # список часов
-
-# Заменяем теги значениями из словаря dTag
-for item in soup.findAll(text=re.compile('{*\w}')):
-    string = item.parent.string
-    if not string is None:
-        item.parent.string = string.format(**dTag)
+    # -------- Проверим на часы
+    if not isHoursRight(dataJSON):
+        print('Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
+        sys.exit()
     else:
-        item.string = item.string.format(**dTag)
+        print("С часами всё ОК.")
 
-with open(os.path.join(folder, fileOut), "w") as file:
-    file.write(str(soup))
+    # Создаём словарь с ключами, которые соответствуют ключам в fodt
+    data = iterData(dataJSON)
+    # TODO: Убрать структуру data совсем, только dTag
+    # делаем копию словаря data, дополняя его вычисляемыми значениями
+    (dTag, ClassesSetContact, ClassesSetIndependent) = FillTags(data)
+
+
+    # --- компетенции считываем
+    raw = GetJsonFromFile(os.path.join(folder, dataJSON['competences']['file']))
+    dataComp = json.loads(raw)
+    competences = {}
+    for key in dataJSON['competences']['items']:
+        competences[key] = dataComp[key]
+
+    # --- Виды занятий
+    raw = GetJsonFromFile(os.path.join(folder, 'Виды занятий.json'))
+    dataClasses = json.loads(raw)
+    classes = []
+    # contact
+    for item in ('lections', 'laboratory', 'practical'):
+        if dataJSON['volume']['contact'][item]>0:
+            classes.append(item)
+    # independent
+    for item in ('theoretical', 'design', 'tasks', 'other'):
+        if dataJSON['volume']['independent'][item]>0:
+            classes.append(item)
+    # Оставляем только использованные в РПД типы занятий
+    classesTypes = []
+    for item in dataClasses:
+        if item['type'] in classes:
+            classesTypes.append(item)
+
+    # --------------- РАБОТА С ШАБЛОНОМ
+    # -------- Читаем шаблон fodt, заменяем теги
+    fileIn = 'layout.fodt'
+    fileOut = (dTag['ProgramCode'] + '_' + dataJSON['competences']['file'].split(' ')[0]+
+        ' - ' + fileJSON.split('.')[0] + '.fodt')
+
+    with open(os.path.join(folder, fileIn), "r") as file:
+        soup = BeautifulSoup(file.read(), features="xml")
+
+    # таблицы
+    fillTableCompetences(soup, 'tblCompAnn', competences)
+    fillTableCompetences(soup, 'tblCompMain', competences)
+    fillTableCompetences(soup, 'tblCompFOS', competences)
+    fillTableCompetencesControl(soup, data['Sections'], dataJSON['competences']['items'], data['VolumeAttestation'])
+
+    fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
+    fillTableLections(soup, data['Sections'])
+    fillTableSections(soup, data['Sections'], dataJSON['competences']['items'])
+    fillTableSeminar(soup, data['Sections'], 'tblLaboratory', 'laboratory')
+    fillTableSeminar(soup, data['Sections'], 'tblPractical', 'practical')
+
+    fillTableClasses(soup, classesTypes)
+    fillList(soup, 'tasks', dataJSON['tasks']) # список задач, их два , вызывает два раза
+    fillList(soup, 'tasks', dataJSON['tasks'])
+    fillList(soup, 'q', dataJSON['questions']) # список вопросов
+
+    # Заменяем теги значениями из словаря dTag
+    for item in soup.findAll(text=re.compile('{*\w}')):
+        string = item.parent.string
+        if not string is None:
+            item.parent.string = string.format(**dTag)
+        else:
+            item.string = item.string.format(**dTag)
+
+    with open(os.path.join(folder, fileOut), "w") as file:
+        file.write(str(soup))
+
+
+    # -------- CPC
+    dTag['Seminar'] = ''
+    if 'laboratory' in ClassesSetContact:
+        dTag['Seminar'] += """ Для успешного выполнения и защиты лабораторной работы
+        предварительно необходимо изучить теоретический материал по соответствующей теме,
+        методические указания, подготовить отчет по установленной форме. После проведения
+        исследований и окончательного оформления отчета проводится защита лабораторной работы.
+        """
+    if 'practical' in ClassesSetContact:
+        dTag['Seminar'] += """ Самостоятельная работа студентов на практических занятиях
+        может предусматривать выполнение контрольных работ; решение задач; работу со
+        справочной, нормативной документацией и научной литературой; защиту выполненных
+        работ; тестирование и т.д. Контроль работы студентов на практических занятиях
+        осуществляет преподаватель в соответствии с требованиями рабочей программы
+        дисциплины.
+        """
+    fileIn = 'layCPC.fodt'
+    fileOut = (dTag['ProgramCode'] + '_' + dataJSON['competences']['file'].split(' ')[0]+
+        ' - ' + fileJSON.split('.')[0] + ' - МУ по СРС.fodt')
+
+    with open(os.path.join(folder, fileIn), "r") as file:
+        soup = BeautifulSoup(file.read(), features="xml")
+
+    # таблицы
+    fillTableClasses(soup, classesTypes)
+    fillTableLiterature(soup, data['LiteratureBase'], data['LiteratureAdditional'])
+    fillTableCPC(soup, data['Sections'])
+
+    fillList(soup, 'tasks', dataJSON['tasks']) # список задач
+
+    # Заменяем теги значениями из словаря dTag
+    for item in soup.findAll(text=re.compile('{*\w}')):
+        string = item.parent.string
+        if not string is None:
+            item.parent.string = string.format(**dTag)
+        else:
+            item.string = item.string.format(**dTag)
+
+    with open(os.path.join(folder, fileOut), "w") as file:
+        file.write(str(soup))
+    # Sections = data['Sections']
+
+    # -------- Рейтинг-план
+    # делим уч. план на занятия: Считаем
+    Seminars = []
+    hoursList = defaultdict(int)
+    for section in data['Sections']:
+        for topic in section['topics']: # пробегаем по топикам
+            Seminars.append({'type':'Лекция (%dч)'%(topic['hours'],),
+                             'content':topic['content'], 'control':'Опрос'})
+            hoursList['lections'] += topic['hours']
+            if 'laboratory' in topic.keys():
+                for work in topic['laboratory']:
+                    Seminars.append({'type':'Лабораторная работа (%dч)'%(work['hours'],),
+                             'content':work['content'], 'control':'Выполнение и защита отчета'})
+                    hoursList['laboratory'] += work['hours']
+            if 'practical' in topic.keys():
+                for work in topic['practical']:
+                    Seminars.append({'type':'Практическое занятие (%dч)'%(work['hours'],),
+                             'content':work['content'], 'control':'Выполнение и сдача задания'})
+                    hoursList['practical'] += work['hours']
+    if len(Seminars)%9 > 0:
+            print('! Колво занятий не соответствует колву недель')
+            sys.exit()
+
+
+    hours = []
+    for (key,value) in hoursList.items():
+        hours.append('%d\t-%s'%(value, ClassesNames["contact"][key]))
+
+    # список с типами контроля
+    mark = []
+    if 'lections' in hoursList.keys():
+        mark.append({'type':'Опрос', 'points':str(int(25/6/(len(Seminars)//18)))})
+    if 'laboratory' in hoursList.keys():
+        mark.append({'type':'Выполнение и защита отчета', 'points':str(int(25/6/(len(Seminars)//18)))})
+    if 'practical' in hoursList.keys():
+        mark.append({'type':'Выполнение и защита задания', 'points':str(int(25/6/(len(Seminars)//18)))})
+    if dataJSON['volume']['attestation'].startswith('зач'):
+        mark.append({'type':dataJSON['volume']['attestation'], 'points':'25'})
+
+    dTag['Group'] = ''
+    fileIn = 'layRating.fodt'
+    fileOut = (dTag['ProgramCode'] + '_' +
+        dataJSON['competences']['file'].split(' ')[0]+
+        ' - ' + fileJSON.split('.')[0] + ' - Рейтинг-план.fodt')
+
+    with open(os.path.join(folder, fileIn), "r") as file:
+        soup = BeautifulSoup(file.read(), features="xml")
+
+    # таблицы
+    fillTableRating(soup, Seminars)
+    # tblControlType
+    table = soup.find(name='table:table', attrs={'table:name':'tblControlType'})
+    rows = table.findAll(name='table:table-row')
+    itemRow = rows[-1]
+    for m in mark:
+        addFilledRow(table, itemRow, m)
+    itemRow.extract()
+
+    fillList(soup, 'Hours', hours) # список часов
+
+    # Заменяем теги значениями из словаря dTag
+    for item in soup.findAll(text=re.compile('{*\w}')):
+        string = item.parent.string
+        if not string is None:
+            item.parent.string = string.format(**dTag)
+        else:
+            item.string = item.string.format(**dTag)
+
+    with open(os.path.join(folder, fileOut), "w") as file:
+        file.write(str(soup))
+
+    print('Формирование документов завершено успешно!')
+
