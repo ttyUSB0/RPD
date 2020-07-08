@@ -23,6 +23,7 @@ import copy
 import re
 from collections import defaultdict
 import sys
+import subprocess
 
 ClassesNames = {"contact":{
       "lections":'лекции',
@@ -513,9 +514,10 @@ def fillTableRating(soup, Seminars):
 # ------------------------------ Главный код
 if __name__ == "__main__":
     if len(sys.argv)!=2:
-        print('Скрипт принимает единственный параметр - имя json-файла с данными дисциплины\npython3 Syllabus.py "СУ ИИ 2019.json"')
+        print('[!] Скрипт принимает единственный параметр - имя json-файла с данными дисциплины\nНапример: python3 Syllabus.py "СУ ИИ 2019.json"')
         sys.exit()
 
+    fileOutList = [] # список файлов fodt, которые мы сгенерируем
     folder = os.getcwd()
     fileJSON = sys.argv[1]
 
@@ -524,15 +526,15 @@ if __name__ == "__main__":
     try:
         dataJSON = json.loads(raw)
     except JSONDecodeError:
-        print ('Проверьте json-файл на корректность (www.jsonlint.com)')
+        print ('[!] Проверьте json-файл на корректность (www.jsonlint.com)')
         sys.exit()
 
     # -------- Проверим на часы
     if not isHoursRight(dataJSON):
-        print('Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
+        print('[!] Часы в плане (volume) не совпадают с суммой по занятиям (sections)')
         sys.exit()
     else:
-        print("С часами всё ОК.")
+        print("[*] С часами всё ОК.")
 
     # Создаём словарь с ключами, которые соответствуют ключам в fodt
     data = iterData(dataJSON)
@@ -602,6 +604,8 @@ if __name__ == "__main__":
 
     with open(os.path.join(folder, fileOut), "w") as file:
         file.write(str(soup))
+    fileOutList.append(fileOut)
+    print('[*] РПД готова!')
 
 
     # -------- CPC
@@ -644,6 +648,8 @@ if __name__ == "__main__":
 
     with open(os.path.join(folder, fileOut), "w") as file:
         file.write(str(soup))
+    fileOutList.append(fileOut)
+    print('[*] МУ по СРС готовы!')
     # Sections = data['Sections']
 
     # -------- Рейтинг-план
@@ -666,7 +672,7 @@ if __name__ == "__main__":
                              'content':work['content'], 'control':'Выполнение и сдача задания'})
                     hoursList['practical'] += work['hours']
     if len(Seminars)%9 > 0:
-            print('! Колво занятий не соответствует колву недель')
+            print('[!] Колво занятий не соответствует колву недель')
             sys.exit()
 
 
@@ -716,6 +722,19 @@ if __name__ == "__main__":
 
     with open(os.path.join(folder, fileOut), "w") as file:
         file.write(str(soup))
+    fileOutList.append(fileOut)
+    print('[*] Рейтинг-план готов!')
 
-    print('Формирование документов завершено успешно!')
+    print('[*] Все fodt готовы!')
 
+    for fileOut in fileOutList:
+        result = subprocess.run(['loffice', '--convert-to', 'doc', fileOut],
+                cwd=folder, capture_output=True, encoding='utf8')
+        print(result)
+    print('[*] Формирование документов doc завершено успешно!')
+
+    fileOut = fileOutList[0]
+    result = subprocess.run(['loffice', '--convert-to', 'pdf', fileOut],
+                cwd=folder, capture_output=True, encoding='utf8')
+    print(result)
+    print('[*] Формирование документов pdf завершено успешно!')
