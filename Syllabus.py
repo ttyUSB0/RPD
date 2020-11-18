@@ -13,6 +13,9 @@ Created on Mon Oct  7 18:32:23 2019
 
 
 Вызов из терминала, первый параметр - имя json-файла с данными дисциплины
+
+! ЭУМКД всегда идёт первой в списке доп литературы.
+
 """
 
 import os
@@ -110,14 +113,15 @@ def isHoursRight(dataJSON):
 
 def fillContents(Sections):
     """ Заполняем краткое содержание
-    Проходим по структуре data['Sections'] """
+    Проходим по структуре data['Sections']
+    upd 11.2020 Оставил только названия секций"""
     Contents = ''
     for section in Sections:
-        Contents += section['name'] + ' ('
-        for topic in section['topics']:
-            Contents += topic['name'][0].lower() + topic['name'][1:] + ', '
-        Contents = Contents[:-2] + '); '
-    return Contents[:-2]
+        Contents += section['name'] #+ ' ('
+        #for topic in section['topics']:
+        #    Contents += topic['name'][0].lower() + topic['name'][1:] + ', '
+        Contents += '; ' #Contents[:-2] + '); '
+    return Contents[:-2] + '.'
 
 def FillTags(data):
     """ Создаём словарь с ключами, которые соответствуют ключам в fodt
@@ -156,6 +160,14 @@ def FillTags(data):
 
     dTag['Percent'] = str(int(100*dTag['VolumeIndependentTheoretical']/dTag['VolumeHoursTotal']))
 
+    # оценочные средства ФОС (до перевода Volume в str)
+    dTag['fosArsenal'] = ''
+    if dTag['VolumeContactPractical']>0:
+        dTag['fosArsenal'] += ' вопросы для защиты практических  работ (текущий контроль);'
+    if dTag['VolumeContactLaboratory']>0:
+        dTag['fosArsenal'] += ' вопросы для защиты лабораторных  работ (текущий контроль);'
+
+
     for key in dTag.keys():
         if key.startswith('VolumeContact') or key.startswith('VolumeIndependent'):
             if dTag[key] == 0: # Заменяем нули на минусы
@@ -163,12 +175,13 @@ def FillTags(data):
             else:
                 dTag[key] = '%.1f(%d)'%(dTag[key]/36, dTag[key])
 
-    # Списки
+    # ----- Списки
+    # Связана с ...
     dTag['ConnectsWithList']=''
     for item in data['ConnectsWith']:
         dTag['ConnectsWithList']=dTag['ConnectsWithList']+'«'+item+'», '
     dTag['ConnectsWithList'] = dTag['ConnectsWithList'][:-2] + '.'
-
+    # Необходима для ...
     dTag['NecessaryForList']=''
     for item in data['NecessaryFor']:
         dTag['NecessaryForList']=dTag['NecessaryForList']+'«'+item+'», '
@@ -290,7 +303,9 @@ def fillTableCompetencesControl(soup, Sections, competences, attestation):
 
 
 def fillTableLiterature(soup, Base, Additional):
-    """ Заполняем таблицу литературы """
+    """ Заполняем таблицу литературы
+    Нумерация сквозная
+    """
     table = soup.find(name='table:table', attrs={'table:name':'tblLiterature'})
     if table is None:
         raise NameError('tblLiterature not found!')
@@ -302,9 +317,11 @@ def fillTableLiterature(soup, Base, Additional):
     item = newRow.find(text=re.compile('{*\w}'))
     item.parent.string = 'Основная литература'
     table.insert(-1, newRow)
+    i = 1
     for n in range(len(Base)):
         book = copy.copy(Base[n])
-        book['n'] = str(n+1)
+        book['n'] = str(i)
+        i += 1
         addFilledRow(table, itemRow, book)
     # Дополнительная литература
     newRow = copy.copy(groupRow)
@@ -313,7 +330,8 @@ def fillTableLiterature(soup, Base, Additional):
     table.insert(-1, newRow)
     for n in range(len(Additional)):
         book = copy.copy(Additional[n])
-        book['n'] = str(n+1)
+        book['n'] = str(i)
+        i += 1
         addFilledRow(table, itemRow, book)
     # удаляем первые две служебные строки-заготовки
     groupRow.extract()
@@ -431,8 +449,10 @@ def fillTableSeminar(soup, Sections, tableName, seminarType):
                 if seminarType in topic.keys():
                     for seminar in topic[seminarType]:
                         i += 1
-                        t = {'n':str(iSection)+'.'+str(i), 'lection':topic['name'],
-                         'seminar':seminar['name'], 'content':seminar['content']}
+                        t = {'n':str(iSection)+'.'+str(i),
+                             'lection':topic['name'],
+                             'seminar':seminar['name']+' ('+str(seminar['hours'])+'ч)',
+                             'content':seminar['content']}
                         addFilledRow(table, itemRow, t)
     # удаляем первые две служебные строки-заготовки
     groupRow.extract()
@@ -567,6 +587,27 @@ if __name__ == "__main__":
     for item in dataClasses:
         if item['type'] in classes:
             classesTypes.append(item)
+
+    # переформатируем список литературы: ключи book,link - из базы
+    # В основной литературе не более 5 наименований
+    # литература не старше 10 лет (можно в доп. литературу), либо приложить протокол НМС о необходимости и актуальности данных изданий
+    raw = json.loads(GetJsonFromFile(os.path.join(folder, 'Литература.json')))
+    LiteratureSet = {}
+    for item in raw:
+        LiteratureSet[item['tag']] = {'book':item['book'], 'link':item['link']}
+
+    def formatBooks(tags):
+        """ переформатируем список литературы: ключи book,link - из базы """
+        Literature = []
+        for tag in tags:
+            if tag in LiteratureSet.keys():
+                Literature.append(LiteratureSet[tag])
+            else:
+                print("[!] Не найдена книга %s"%(tag,))
+        return Literature
+    data['LiteratureBase'] = formatBooks(data['LiteratureBase'])
+    data['LiteratureAdditional'] = formatBooks(data['LiteratureAdditional'])
+    dTag['umkdN'] = len(data['LiteratureBase']) + 1 #! ЭУМКД всегда идёт первой в списке доп литературы.
 
     # --------------- РАБОТА С ШАБЛОНОМ
     # -------- Читаем шаблон fodt, заменяем теги
@@ -730,11 +771,17 @@ if __name__ == "__main__":
     for fileOut in fileOutList:
         result = subprocess.run(['loffice', '--convert-to', 'doc', fileOut],
                 cwd=folder, capture_output=True, encoding='utf8')
+        os.remove(os.path.join(folder, fileOut))
         print(result)
-    print('[*] Формирование документов doc завершено успешно!')
-
+    print('[*] Формирование документов doc завершено успешно! .fodt удалены..')
+    print('[-] Удалить лишние таблицы (5.3), обновить содержание.')
+    """
     fileOut = fileOutList[0]
     result = subprocess.run(['loffice', '--convert-to', 'pdf', fileOut],
                 cwd=folder, capture_output=True, encoding='utf8')
     print(result)
     print('[*] Формирование документов pdf завершено успешно!')
+    """
+
+else:
+    print('Вызывать из терминала!')
