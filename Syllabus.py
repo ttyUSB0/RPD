@@ -40,7 +40,7 @@ ClassesNames = {"contact":{
       "individual":'индивидуальная работа с преподавателем',
       "other":'иная контактная внеаудиторная работа'},
     "independent":{
-      "theoretical":'изучение теоретического курса',
+      "theoretical":'изучение обучающимися теоретического курса',
       "tasks":'индивидуальные задания',
       "calculations":'расчетно-графические работы',
       "essay":'эссе',
@@ -207,10 +207,13 @@ def FillTags(data):
     if CodeUp[0].startswith('Б'):
         if CodeUp[1].startswith('Б'):
             dTag['PartName'] += 'обязательную часть блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
+            dTag['PlaceInStruct'] = 'Дисциплина «%s» (%s) входит в обязательную часть блока Б1 «Дисциплины (модули)».'%(dTag['Name'],dTag['CodeUp'])
         elif CodeUp[1].startswith('В') :
             dTag['PartName'] += 'часть, формируемую участниками образовательных отношений блока Б%s «Дисциплины (модули)»'%(CodeUp[0][1:],)
+            dTag['PlaceInStruct'] = 'Дисциплина «%s» (%s) входит в часть, формируемую участниками образовательных отношений, блока Б1 «Дисциплины (модули)».'%(dTag['Name'],dTag['CodeUp'])
             if len(CodeUp) > 2: #    Б1.В.ДВ
                 dTag['PartName'] += ' и относится к дисциплинам по выбору студента'
+                dTag['PlaceInStruct'] = 'Дисциплина «%s» (%s) входит в часть, формируемую участниками образовательных отношений, блока Б1 «Дисциплины (модули)» и относится к элективным дисциплинам.'%(dTag['Name'],dTag['CodeUp'])
 
     #code = re.findall(r'[А-Я]+', data['CodeUp'])
     #number = re.findall(r'\d+', data['CodeUp'])
@@ -228,23 +231,35 @@ def FillTags(data):
             ClassesSetIndependent.append(key)
 
     dTag['ClassesSetContact'] = ''
+    dTag['ClassesSetContact3pp'] = ''
+    dTag['ClassesSetContactPL3pp'] = ''
+
+
     if ClassesSetContact: # если непустой список
         if 'lections' in ClassesSetContact:
             dTag['ClassesSetContact'] = 'занятия лекционного типа'
+            dTag['ClassesSetContact3pp'] = 'занятия лекционного типа,'
         temp = ClassesSetContact[:]
         temp.remove('lections')
         if temp: # есть что-то кроме lections
             dTag['ClassesSetContact'] += ', занятия семинарского типа ('
+            dTag['ClassesSetContact3pp'] += ', занятия семинарского типа '
             for key in temp:
+                dTag['ClassesSetContactPL3pp'] += ClassesNames['contact'][key] + ', '
                 dTag['ClassesSetContact'] += ClassesNames['contact'][key] + ', '
             dTag['ClassesSetContact'] = dTag['ClassesSetContact'][:-2]
+            dTag['ClassesSetContactPL3pp'] = dTag['ClassesSetContactPL3pp'][:-2]
             dTag['ClassesSetContact'] += ')'
 
     dTag['ClassesSetIndependent'] = ''
+    dTag['ClassesDesign'] = ''
     if ClassesSetIndependent: # если непустой список
         for key in ClassesSetIndependent:
             dTag['ClassesSetIndependent'] += ClassesNames['independent'][key] + ', '
         dTag['ClassesSetIndependent'] = dTag['ClassesSetIndependent'][:-2]
+        if 'design' in ClassesSetIndependent:
+            dTag['ClassesDesign'] = 'Примерный перечень тем курсового проекта приводится в Фонде оценочных средств для проведения текущего контроля и промежуточной аттестации по дисциплине (ФОС), представленном в приложении к рабочей программе.'
+
 
     """ Программой дисциплины «Наименование дисциплины» предусмотрены занятия лекционного типа, занятия семинарского типа и самостоятельная работа обучающихся.  (Выбрать необходимый (ые) тип (ы) занятий)
 На занятиях семинарского типа выполняются практические работы, лабораторные работы. (Выбрать необходимый (ые) вид (ы) занятий)
@@ -253,7 +268,8 @@ def FillTags(data):
 Для запланированных видов занятий разработаны учебно-методические материалы, которые включены в состав электронного учебно-методического комплекса дисциплины (ЭУМКД) / дистанционного курса по дисциплине «Наименование дисциплины» [5]. (Указывается ссылка на номер позиции ЭОР - УМК / Дистанционного курса  в п. 7.1. Рекомендуемая  литература РПД)
 Практическая подготовка при реализации дисциплины «Наименование дисциплины» организуется путем проведения: отдельных занятий лекционного типа, которые предусматривают передачу обучающимся учебной информации, необходимой для последующего выполнения работ, связанных с будущей профессиональной деятельностью;  практических занятий; практикумов; лабораторных работ, предусматривающих участие обучающихся в выполнении отдельных элементов работ, связанных с будущей профессиональной деятельностью. (Текст абзаца приводится, если по дисциплине, участвующей  в формировании  профессиональной (ых) компетенции (ий), предусмотрены занятия в форме практической подготовки. Нужно указать виды учебной работы, которые реализуются  в форме практической подготовки. Перечень занятий в форме практической подготовки отображается в таблице п. 5.4.)
     """
-    'ClassesText'
+
+
 
     return (dTag, ClassesSetContact, ClassesSetIndependent)
 
@@ -546,6 +562,24 @@ def fillTableRating(soup, Seminars):
             week += 1
     itemRow.extract()
 
+def fillTableThemes(soup, designThemes):
+    """ Заполняем таблицу Темы курсового """
+    table = soup.find(name='table:table', attrs={'table:name':'tblDesignThemes'})
+    if table is None:
+        raise NameError('tblClasses not found!')
+    rows = table.findAll(name='table:table-row')
+    lastRow = rows[-1]
+
+    if designThemes is None:
+        designThemes = ['']
+
+    i = 0 # номер порядковый в таблице
+    for theme in designThemes:
+        i += 1
+        addFilledRow(table, lastRow, {'n':str(i), 'theme':theme})
+     # удаляем служебные строки-заготовки
+    lastRow.extract()
+
 
 # ------------------------------ Главный код
 if __name__ == "__main__":
@@ -627,7 +661,12 @@ if __name__ == "__main__":
 
     # --------------- РАБОТА С ШАБЛОНОМ
     # -------- Читаем шаблон fodt, заменяем теги
-    fileIn = 'layout.fodt'
+    print('[*] стандарт %s'%(data['StandardName'],))
+    if data['StandardName']=="ФГОС ВО":
+        fileIn = 'layout.fodt'
+        dTag['designThemes'] = None # не знаю, у меня не было КП в этом ФГОС. В шаблоне этого нет
+    elif data['StandardName']=="ФГОС 3++":
+        fileIn = 'layout3pp.fodt'
     fileOut = (dTag['ProgramCode'] + '_' + dataJSON['competences']['file'].split(' ')[0]+
         ' - ' + fileJSON.split('.')[0] + '.fodt')
 
@@ -649,6 +688,10 @@ if __name__ == "__main__":
     fillTableClasses(soup, classesTypes)
     fillList(soup, 'tasks', dataJSON['tasks']) # список задач, их два , вызывает два раза
     fillList(soup, 'tasks', dataJSON['tasks'])
+    try:
+        fillTableThemes(soup, dataJSON['designThemes'])
+    except Exception:
+        pass
     fillList(soup, 'q', dataJSON['questions']) # список вопросов
 
     # Заменяем теги значениями из словаря dTag
